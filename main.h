@@ -55,15 +55,10 @@
 //-----------------------------------------------------------------------------
 // メモリ解放マクロ
 //-----------------------------------------------------------------------------
-#define SAFE_RELEASE(ptr)		\
-{								\
-	if(ptr){					\
-		(ptr)->Release();		\
-		(ptr) = NULL;			\
-	}							\
-}
-
-
+#define SAFE_RELEASE(p) if (p) { p->Release(); p = NULL; }
+#define SAFE_DELETE_ARRAY(a) { delete [] (a); (a) = NULL; }
+#define SAFE_DELETE(p) if(p){ delete[] p; p=NULL; }
+#define SAFE_DESTROY(x) { if(x) { (x)->Destroy(); (x) = NULL; } }
 //-----------------------------------------------------------------------------
 // 物理計算
 //-----------------------------------------------------------------------------
@@ -109,24 +104,34 @@ enum STAGE
 // 構造体定義
 //*****************************************************************************
 // ２Ｄポリゴン頂点フォーマットに合わせた構造体を定義
-typedef struct
+struct  VERTEX_2D
 {
 	D3DXVECTOR3		vtx;		// 頂点座標
 	float			rhw;		// テクスチャのパースペクティブコレクト用
 	D3DCOLOR		diffuse;	// 反射光
 	D3DXVECTOR2		tex;		// テクスチャ座標
-} VERTEX_2D;
+};
 
 
 // TRANSFORM構造体を定義●中込注：仮
-typedef struct
+struct  TRANSFORM
 {
 	D3DXVECTOR3		pos;			// 位置
 	D3DXVECTOR3		rot;			// 回転
 	D3DXVECTOR3		scl;			// 大きさ
-} TRANSFORM, *PTRANSFORM;
+};
 
-
+struct CHARACTER 
+{
+	char name[32];
+	int HP;
+	int MP;
+	int ATK;
+	int DEF;
+	int LUCK;
+	int EXP;
+	int LV;
+};
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************

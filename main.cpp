@@ -15,7 +15,8 @@
 //#include "title.h"
 #include "font.h"
 #include "debugproc.h"
-
+#include "player.h"
+#include "bullet.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -141,7 +142,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				frameCount = 0;
 			}
 
-			if((currentTime - execLastTime) >= (1000 / 60))
+			if((currentTime - execLastTime) >= (1000 / FPS))
 			{
 				execLastTime = currentTime;
 
@@ -289,6 +290,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitInput(hInstance, hWnd);	// 入力処理の初期化
 	InitSound(hWnd);			// サウンドの初期化
 	InitFont();					// フォントの初期化
+	InitPlayer();				// プレイヤーの初期化
+	InitBullet();				// バレットの初期化
 #ifdef _DEBUG
 	InitDebugProc();			// デバッグ表示の初期化
 #endif
@@ -297,7 +300,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//GetSound(BGM_BATTLE_1)->SetVolume(-200);
 
 	// 最初のステージを設定
-	stage = TITLE;
+	//stage = TITLE;
+	stage = GAME;
 
 	return S_OK;
 }
@@ -316,7 +320,8 @@ void Uninit(void)
 	UninitInput();				// 入力処理の終了処理
 	UninitSound();				// サウンドの終了処理
 	UninitFont();				// フォントの終了処理
-
+	UninitPlayer();				// プレイヤーの初期化
+	UninitBullet();				// バレットの初期化
 	// デバイスの開放
 	if(pD3DDevice != NULL)
 	{
@@ -352,6 +357,8 @@ void Update(void)
 		break;
 
 	case GAME:
+		UpdatePlayer();				// プレイヤーの初期化
+		UpdateBullet();				// バレットの初期化
 		break;
 
 	case PAUSE:
@@ -394,6 +401,8 @@ void Draw(void)
 			break;
 
 		case GAME:
+			DrawPlayer();				// プレイヤーの初期化
+			DrawBullet();				// バレットの初期化
 			break;
 
 		case PAUSE:
