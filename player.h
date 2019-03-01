@@ -7,25 +7,11 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
+#include "main.h"
 
-
-
-#include "bullet.h"
-// マクロ定義
-//#define TEXTURE_GAME_SAMPLE00	_T("data/TEXTURE/runningman000.png")	// サンプル用画像
-//#define TEXTURE_SAMPLE00_SIZE_X	(200) // テクスチャサイズ
-//#define TEXTURE_SAMPLE00_SIZE_Y	(200) // 同上
-//
-//
-//#define TEXTURE_PATTERN_DIVIDE_X	(8)	// アニメパターンのテクスチャ内分割数（X)
-//#define TEXTURE_PATTERN_DIVIDE_Y	(1)	// アニメパターンのテクスチャ内分割数（Y)
-//#define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// アニメーションパターン数
-//#define TIME_ANIMATION				(100)	// アニメーションの切り替わるカウント
-
-
-#define TEXTURE_GAME_SAMPLE00	_T("data/TEXTURE/runningman001.png")	// サンプル用画像
-#define TEXTURE_SAMPLE00_SIZE_X	(140) // テクスチャサイズ
-#define TEXTURE_SAMPLE00_SIZE_Y	(200) // 同上
+#define TEXTURE_GAME_PLAYER	_T("data/TEXTURE/player.png")	// サンプル用画像
+#define TEXTURE_PLAYER_SIZE_X	(140) // テクスチャサイズ
+#define TEXTURE_PLAYER_SIZE_Y	(200) // 同上
 
 #define TEXTURE_PATTERN_DIVIDE_X	(5)	// アニメパターンのテクスチャ内分割数（X)
 #define TEXTURE_PATTERN_DIVIDE_Y	(2)	// アニメパターンのテクスチャ内分割数（Y)
@@ -35,39 +21,28 @@
 /*******************************************************************************
 * 構造体定義
 ********************************************************************************/
-struct	 PLAYER				// キャラクターの基本構造体
+struct	PLAYER				// キャラクターの基本構造体
 {
 	CHARACTER	status;			// 共通パラメーター
-	
-	//LPDIRECT3DTEXTURE9		g_pD3DTexturePlayer = NULL;		// テクスチャへのポリゴン
-	//
-	//VERTEX_2D				g_vertexWk[NUM_VERTEX];				// 頂点情報格納ワーク
-	D3DXVECTOR3				g_posPlayer;						// ポリゴンの移動量
-	D3DXVECTOR3				g_rotPlayer;						// ポリゴンの回転量
-	int						g_nCountAnim;						// アニメーションカウント
-	int						g_nPatternAnim;						// アニメーションパターンナンバー
 
-	float					g_fRadiusPlayer;					// ポリゴンの半径
-	float					g_fBaseAnglePlayer;					// ポリゴンの角度
-
-	/*
-	g_fBaseAnglePolygon = Atan2f(120,80)
-	D3DXVECTOR2 temp= D3DXVECTOR2()
-	*/
-
+	D3DXVECTOR3				pos;					// ポリゴンの移動量
+	int						patternAnim;			// アニメーションパターンナンバー
+	float						countAnim;				// アニメーションカウント	
+	LPDIRECT3DTEXTURE9		texture = NULL;			// テクスチャへのポリゴン
+	VERTEX_2D				vtx[NUM_VERTEX];		// 頂点情報格納ワーク
+	float					radius;					// ポリゴンの角度	
+	float					baseAngle;
 	int						direction = -1;
-	int						bullet_num = 0;
-	int						score = 0;
+	int						moving_cooldown = -1;	
+	int						speed;
 };
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT InitPlayer(void);
-void UninitPlayer(void);
-void UpdatePlayer(void);
-void DrawPlayer(void);
-PLAYER *GetPlayer(int pno);	// プレイヤーの(アドレス)を取得
-
-
+HRESULT InitPlayer(int type);
+void	UninitPlayer(void);
+void	UpdatePlayer(void);
+void	DrawPlayer(void);
+PLAYER  *GetPlayer(int pno);	// プレイヤーの(アドレス)を取得
 #endif

@@ -1,51 +1,54 @@
 //=============================================================================
 //
-// ポリゴン処理 [player.cpp]
-// Author : 
+// プレーヤー処理 [player.cpp]
+// Author : 徐　ワイ延
 //
 //=============================================================================
-#include "main.h"
 #include "player.h"
 #include "input.h"
-
+#include "bullet.h"
+#include "debugproc.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-
-
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT MakeVertexPlayer(void);
-void SetVertexPlayer(void);
-void SetTexturePlayer( int cntPattern );	
-
+HRESULT	 MakeVertexPlayer(void);
+void	 SetVertexPlayer(void);
+void	 SetTexturePlayer(int dir,int cntPattern);
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		g_pD3DTexturePlayer = NULL;		// テクスチャへのポリゴン
-VERTEX_2D				g_vertexWk[NUM_VERTEX];			// 頂点情報格納ワーク  
-PLAYER					player[PLAYER_MAX];
+PLAYER	 player[PLAYER_MAX];
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT InitPlayer(void)
+HRESULT InitPlayer(int type)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	PLAYER *player = GetPlayer(0);	// プレイヤー０番のアドレスを取得する	
-	//player->g_posPlayer = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_SAMPLE00_SIZE_X/2, SCREEN_CENTER_Y - TEXTURE_SAMPLE00_SIZE_Y/2, 0.0f);
-	player->g_posPlayer = D3DXVECTOR3(SCREEN_CENTER_X - TEXTURE_SAMPLE00_SIZE_X / 2, SCREEN_CENTER_Y - TEXTURE_SAMPLE00_SIZE_Y / 2, 0.0f);
-
-	player->g_posPlayer = D3DXVECTOR3(SCREEN_CENTER_X + TEXTURE_SAMPLE00_SIZE_X / 2, SCREEN_CENTER_Y + TEXTURE_SAMPLE00_SIZE_Y / 2, 0.0f);
-	player->g_rotPlayer = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	player->g_nCountAnim = 0;
-	player->g_nPatternAnim = 0;
+	// テクスチャーの初期化を行う？
+	if (type == 0)
+	{
+		// テクスチャの読み込み
+		D3DXCreateTextureFromFile(pDevice,				// デバイスのポインタ
+								  TEXTURE_GAME_PLAYER,	// ファイルの名前
+								  &player->texture);
+	}
+	// プレイヤーの初期化処理	   
+	player->pos = D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y, 0.0f);
+	player->countAnim = 0;
+	player->patternAnim = 0;
+	player->direction = 1;
+	player->moving_cooldown = 0;
+	player->speed = 3;
+	player->status.ATK = 5;
+	D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X, TEXTURE_PLAYER_SIZE_Y);
+	player->radius = D3DXVec2Length(&temp);
+	player->baseAngle = atan2f(TEXTURE_PLAYER_SIZE_Y, TEXTURE_PLAYER_SIZE_X);	// プレイヤーの角度を初期化
 	// 頂点情報の作成
 	MakeVertexPlayer();
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile( pDevice,		// デバイスのポインタ
-		TEXTURE_GAME_SAMPLE00,				// ファイルの名前
-		&g_pD3DTexturePlayer );			// 読み込むメモリのポインタ	
 	return S_OK;
 }
 
@@ -54,11 +57,8 @@ HRESULT InitPlayer(void)
 //=============================================================================
 void UninitPlayer(void)
 {
-	if( g_pD3DTexturePlayer != NULL )	//
-	{	// テクスチャの開放
-		g_pD3DTexturePlayer->Release();
-		g_pD3DTexturePlayer = NULL;
-	}
+	PLAYER *player = GetPlayer(0);	
+	SAFE_RELEASE(player->texture);
 }
 
 //=============================================================================
@@ -66,56 +66,70 @@ void UninitPlayer(void)
 //=============================================================================
 void UpdatePlayer(void)
 {			
-	//player->bullet_num = 0;
-	
+	PLAYER *player = GetPlayer(0);
 	// アニメーション	
-	player->g_nCountAnim++;
-	if ((player->g_nCountAnim % FPS) != 0)
+	player->countAnim+= player->speed*0.1f;
+	if (player->moving_cooldown > 0)
 	{
-		player->g_nPatternAnim = (player->g_nPatternAnim + 1) % ANIM_PATTERN_NUM;
+		player->patternAnim = (int)(player->countAnim) % ANIM_PATTERN_NUM;
+		// テクスチャ座標を設定
+		SetTexturePlayer(player->direction,player->patternAnim);
+		if (player->patternAnim == 1 || player->patternAnim == 6)
+			player->moving_cooldown--;
 	}
-
-	if (player->g_posPlayer.x < 0) 
-	{
-		player->g_posPlayer.x = SCREEN_WIDTH - TEXTURE_SAMPLE00_SIZE_X / 2;
-	}
-	if (player->g_posPlayer.x > SCREEN_WIDTH - TEXTURE_SAMPLE00_SIZE_X / 2)
-	{
-		player->g_posPlayer.x = 0;
-	}
-	if (player->g_posPlayer.y < 0)
-	{
-		player->g_posPlayer.y = SCREEN_HEIGHT - TEXTURE_SAMPLE00_SIZE_Y;
-	}
-	if (player->g_posPlayer.y > SCREEN_HEIGHT - TEXTURE_SAMPLE00_SIZE_Y)
-	{
-		player->g_posPlayer.y = 0;
-	}
-
 	// 入力対応
-	if (GetKeyboardPress(DIK_DOWN)) {
-		player->g_posPlayer.y += 5;
+	if (GetKeyboardPress(DIK_DOWN) || IsButtonPressed(0, BUTTON_DOWN))
+	{
+		player->moving_cooldown = 1;
+		player->pos.y += player->speed;
 	}
-	if (GetKeyboardPress(DIK_UP)) {
-		player->g_posPlayer.y -= 5;
+	if (GetKeyboardPress(DIK_UP) ||	IsButtonPressed(0, BUTTON_UP))
+	{
+		player->moving_cooldown = 1;
+		player->pos.y -= player->speed;
 	}
-	if (GetKeyboardPress(DIK_LEFT)) {
-		player->g_posPlayer.x -= 5;
+	if (GetKeyboardPress(DIK_LEFT) || IsButtonPressed(0, BUTTON_LEFT)) 
+	{
+		player->moving_cooldown = 1;
+		player->direction = -1;
+		player->pos.x -= player->speed;
 	}
-	if (GetKeyboardPress(DIK_RIGHT)) {		
-		player->g_posPlayer.x += 5;
+	if (GetKeyboardPress(DIK_RIGHT)	|| IsButtonPressed(0, BUTTON_RIGHT))
+	{
+		player->moving_cooldown = 1;
+		player->direction = 1;
+		player->pos.x += player->speed;
 	}
-	if (GetKeyboardPress(DIK_SPACE) ) {	
-		//BULLET *bullet = GetBullet(player->bullet_num % BULLET_MAX);
-		//while (!bullet->use) {
-			//OutputDebugStringA("\nSPACE\n");			
-		BULLET *bullet = GetBullet(player->bullet_num );
-		//Sleep(20);
-		bullet->use = TRUE;
-		player->bullet_num = (++player->bullet_num % (BULLET_MAX));
-			
+	if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTriggered(0, BUTTON_A))
+	{
+		D3DXVECTOR3 player_centre;
+		if (player->direction == -1)
+			player_centre.x = player->pos.x;
+		else
+			player_centre.x = player->pos.x + TEXTURE_PLAYER_SIZE_X;
+		player_centre.y = player->pos.y + TEXTURE_PLAYER_SIZE_Y;
+		SetBullet(player_centre,player->status.ATK, player->direction);
 	}
-  	MakeVertexPlayer();
+	if (player->pos.x < 0)
+	{
+		player->pos.x = 0;
+	}
+	else if (player->pos.x > SCREEN_WIDTH - TEXTURE_PLAYER_SIZE_X)
+	{
+		//右にスクール
+		player->pos.x = SCREEN_WIDTH - TEXTURE_PLAYER_SIZE_X;
+	}
+	else if (player->pos.y < SCREEN_HEIGHT /4)
+	{
+		player->pos.y = SCREEN_HEIGHT / 4;
+	}
+	else if (player->pos.y > SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y)
+	{
+		player->pos.y = SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y;
+	}
+
+	// 移動後の座標で頂点を設定
+	SetVertexPlayer();
 }
 
 //=============================================================================
@@ -124,12 +138,14 @@ void UpdatePlayer(void)
 void DrawPlayer(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	PLAYER *player = GetPlayer(0);
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 	// テクスチャの設定
-	pDevice->SetTexture( 0, g_pD3DTexturePlayer );
+	pDevice->SetTexture( 0, player->texture);
 	// ポリゴンの描画
-	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, g_vertexWk, sizeof(VERTEX_2D));	
+	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, player->vtx, sizeof(VERTEX_2D));	
+	PrintDebugProc(1,"Dir:%d", player->direction);
 }
 
 //=============================================================================
@@ -138,21 +154,26 @@ void DrawPlayer(void)
 HRESULT MakeVertexPlayer(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
+	PLAYER *player = GetPlayer(0);
 	// 頂点座標の設定
 	SetVertexPlayer();
 	// rhwの設定
-	g_vertexWk[0].rhw =
-	g_vertexWk[1].rhw =
-	g_vertexWk[2].rhw =
-	g_vertexWk[3].rhw = 1.0f;
+	player->vtx[0].rhw =
+	player->vtx[1].rhw =
+	player->vtx[2].rhw =
+	player->vtx[3].rhw = 1.0f;
 	// 反射光の設定
-	g_vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	g_vertexWk[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	g_vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	g_vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	player->vtx[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	player->vtx[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	player->vtx[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	player->vtx[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 	// テクスチャ座標の設定
-	SetTexturePlayer(player->g_nPatternAnim);
+	player->vtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	player->vtx[1].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 0.0f);
+	player->vtx[2].tex = D3DXVECTOR2(0.0f, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
+	player->vtx[3].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
+	// テクスチャの設定
+	SetTexturePlayer(player->direction,player->patternAnim);
 	return S_OK;
 }
 
@@ -161,22 +182,39 @@ HRESULT MakeVertexPlayer(void)
 //=============================================================================
 void SetVertexPlayer(void)
 {
+	PLAYER *player = GetPlayer(0);
 	// 頂点座標の設定
-	g_vertexWk[0].vtx = D3DXVECTOR3(player->g_posPlayer.x, player->g_posPlayer.y, player->g_posPlayer.z);
-	g_vertexWk[1].vtx = D3DXVECTOR3(player->g_posPlayer.x + TEXTURE_SAMPLE00_SIZE_X, player->g_posPlayer.y, player->g_posPlayer.z);
-	g_vertexWk[2].vtx = D3DXVECTOR3(player->g_posPlayer.x, player->g_posPlayer.y + TEXTURE_SAMPLE00_SIZE_Y, player->g_posPlayer.z);
-	g_vertexWk[3].vtx = D3DXVECTOR3(player->g_posPlayer.x + TEXTURE_SAMPLE00_SIZE_X, player->g_posPlayer.y + TEXTURE_SAMPLE00_SIZE_Y, player->g_posPlayer.z);
+	player->vtx[0].vtx = D3DXVECTOR3(player->pos.x,	player->pos.y,0);
+	player->vtx[1].vtx = D3DXVECTOR3(player->pos.x + TEXTURE_PLAYER_SIZE_X,	player->pos.y,0);
+	player->vtx[2].vtx = D3DXVECTOR3(player->pos.x,	player->pos.y + TEXTURE_PLAYER_SIZE_Y,0);
+	player->vtx[3].vtx = D3DXVECTOR3(player->pos.x + TEXTURE_PLAYER_SIZE_X,	player->pos.y + TEXTURE_PLAYER_SIZE_Y,0);
 }
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void SetTexturePlayer( int cntPattern )
+void SetTexturePlayer(int dir, int cntPattern )
 {
+	PLAYER *player = GetPlayer(0);
 	// テクスチャ座標の設定
-	g_vertexWk[0].tex = D3DXVECTOR2((float)(cntPattern % TEXTURE_PATTERN_DIVIDE_X) / (float)TEXTURE_PATTERN_DIVIDE_X, (float)(cntPattern / TEXTURE_PATTERN_DIVIDE_X) / (float)TEXTURE_PATTERN_DIVIDE_Y);
-	g_vertexWk[1].tex = D3DXVECTOR2((float)((cntPattern % TEXTURE_PATTERN_DIVIDE_X) + 1)/ (float)TEXTURE_PATTERN_DIVIDE_X, (float)(cntPattern / TEXTURE_PATTERN_DIVIDE_X) / (float)TEXTURE_PATTERN_DIVIDE_Y);
-	g_vertexWk[2].tex = D3DXVECTOR2((float)(cntPattern % TEXTURE_PATTERN_DIVIDE_X) / (float)TEXTURE_PATTERN_DIVIDE_X, (float)((cntPattern / TEXTURE_PATTERN_DIVIDE_X) + 1) / (float)TEXTURE_PATTERN_DIVIDE_Y);
-	g_vertexWk[3].tex = D3DXVECTOR2((float)((cntPattern % TEXTURE_PATTERN_DIVIDE_X) + 1) / (float)TEXTURE_PATTERN_DIVIDE_X, (float)((cntPattern / TEXTURE_PATTERN_DIVIDE_X) + 1)/ (float)TEXTURE_PATTERN_DIVIDE_Y);
+	int x = cntPattern % TEXTURE_PATTERN_DIVIDE_X;
+	int y = cntPattern / TEXTURE_PATTERN_DIVIDE_X;
+	float sizeX = 1.0f / TEXTURE_PATTERN_DIVIDE_X;
+	float sizeY = 1.0f / TEXTURE_PATTERN_DIVIDE_Y;
+	
+	if (dir == 1)
+	{
+		player->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		player->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		player->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		player->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	}
+	else
+	{
+		player->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		player->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		player->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		player->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	}
 }
 /*******************************************************************************
 関数名:	PLAYER *GetMapAdr( int pno )

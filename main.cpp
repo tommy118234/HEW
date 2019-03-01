@@ -17,7 +17,7 @@
 #include "debugproc.h"
 #include "player.h"
 #include "bullet.h"
-
+#include "enemy.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -290,8 +290,9 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitInput(hInstance, hWnd);	// 入力処理の初期化
 	InitSound(hWnd);			// サウンドの初期化
 	InitFont();					// フォントの初期化
-	InitPlayer();				// プレイヤーの初期化
-	InitBullet();				// バレットの初期化
+	InitPlayer(0);				// プレイヤーの初期化
+	InitBullet(0);				// バレットの初期化
+	InitEnemy(0);				// ENEMYの初期化
 #ifdef _DEBUG
 	InitDebugProc();			// デバッグ表示の初期化
 #endif
@@ -316,25 +317,28 @@ void Uninit(void)
 	UninitDebugProc();			// デバッグ表示の終了
 #endif
 
-	//UninitTitle();				// タイトルの終了処理
+	//UninitTitle();			// タイトルの終了処理
 	UninitInput();				// 入力処理の終了処理
 	UninitSound();				// サウンドの終了処理
 	UninitFont();				// フォントの終了処理
-	UninitPlayer();				// プレイヤーの初期化
-	UninitBullet();				// バレットの初期化
+	UninitPlayer();				// プレイヤーの終了処理
+	UninitBullet();				// バレットの終了処理
+	UninitEnemy();				// ENEMYの終了処理
 	// デバイスの開放
-	if(pD3DDevice != NULL)
-	{
-		pD3DDevice->Release();
-		pD3DDevice = NULL;
-	}
-
+	SAFE_RELEASE(pD3DDevice);
 	// Direct3Dオブジェクトの開放
-	if(Direct3D != NULL)
-	{
-		Direct3D->Release();
-		Direct3D = NULL;
-	}
+	SAFE_RELEASE(Direct3D);
+	//if(pD3DDevice != NULL)
+	//{
+	//	pD3DDevice->Release();
+	//	pD3DDevice = NULL;
+	//}
+	//
+	//if(Direct3D != NULL)
+	//{
+	//	Direct3D->Release();
+	//	Direct3D = NULL;
+	//}
 }
 
 //=============================================================================
@@ -342,9 +346,7 @@ void Uninit(void)
 //=============================================================================
 void Update(void)
 {
-
-	UpdateInput();				// 入力更新
-		
+	UpdateInput();					// 入力更新		
 	switch (stage)
 	{
 	case SPLASH:
@@ -357,8 +359,9 @@ void Update(void)
 		break;
 
 	case GAME:
-		UpdatePlayer();				// プレイヤーの初期化
-		UpdateBullet();				// バレットの初期化
+		UpdatePlayer();				// プレイヤーの更新
+		UpdateBullet();				// バレットの更新
+		UpdateEnemy();				// ENEMYの更新
 		break;
 
 	case PAUSE:
@@ -401,8 +404,9 @@ void Draw(void)
 			break;
 
 		case GAME:
-			DrawPlayer();				// プレイヤーの初期化
-			DrawBullet();				// バレットの初期化
+			DrawPlayer();				// プレイヤーの描画
+			DrawBullet();				// バレットの描画
+			DrawEnemy();				// ENEMYの描画
 			break;
 
 		case PAUSE:

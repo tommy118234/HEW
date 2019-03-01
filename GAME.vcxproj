@@ -126,6 +126,7 @@
   <ItemGroup>
     <ClCompile Include="bullet.cpp" />
     <ClCompile Include="debugproc.cpp" />
+    <ClCompile Include="enemy.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="main.cpp" />
@@ -136,6 +137,7 @@
   <ItemGroup>
     <ClInclude Include="bullet.h" />
     <ClInclude Include="debugproc.h" />
+    <ClInclude Include="enemy.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="main.h" />
