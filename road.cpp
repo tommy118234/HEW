@@ -76,11 +76,11 @@ void UninitRoad(void)
 //=============================================================================
 void UpdateRoad(void)
 {
-	if (IsButtonPressed(0, BUTTON_RIGHT) || GetKeyboardPress(DIK_D))
+	if (IsButtonPressed(0, BUTTON_RIGHT) || GetKeyboardPress(DIK_RIGHT))
 	{
 		road.pos.x -= MOVE_SPEED_X;
 	}
-	else if (IsButtonPressed(0, BUTTON_LEFT) || GetKeyboardPress(DIK_A))
+	else if (IsButtonPressed(0, BUTTON_LEFT) || GetKeyboardPress(DIK_LEFT))
 	{
 		road.pos.x += MOVE_SPEED_X;
 	}

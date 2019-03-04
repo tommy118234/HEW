@@ -75,11 +75,11 @@ void UninitBg(void)
 //=============================================================================
 void UpdateBg(void)
 {
-	if (IsButtonPressed(0, BUTTON_RIGHT) || GetKeyboardPress(DIK_D))
+	if (IsButtonPressed(0, BUTTON_RIGHT) || GetKeyboardPress(DIK_RIGHT))
 	{
 		bg.pos.x -= MOVE_SPEED_X;
 	}
-	else if (IsButtonPressed(0, BUTTON_LEFT) || GetKeyboardPress(DIK_A))
+	else if (IsButtonPressed(0, BUTTON_LEFT) || GetKeyboardPress(DIK_LEFT))
 	{
 		bg.pos.x += MOVE_SPEED_X;
 	}

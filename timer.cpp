@@ -86,16 +86,16 @@ void UpdateTimer(void)
 {
 	timer.currentTime = GetTime();
 
-	// システム時刻で1秒経過ごとに表示タイムをカウントダウン
-	if ((timer.currentTime - timer.lastTime) >= SECOND_TIME)
-	{
-		timer.lastTime = timer.currentTime;
-		timer.displayTime--;
-	}
+	//// システム時刻で1秒経過ごとに表示タイムをカウントダウン
+	//if ((timer.currentTime - timer.lastTime) >= SECOND_TIME)
+	//{
+	//	timer.lastTime = timer.currentTime;
+	//	timer.displayTime--;
+	//}
 
-	wsprintf(text, TEXT("%d\n"), &timer.displayTime);
+	//wsprintf(text, TEXT("%d\n"), &timer.displayTime);
 
-	SetVertexTimer();
+	//SetVertexTimer();
 }
 
 
