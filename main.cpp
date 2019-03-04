@@ -18,6 +18,11 @@
 #include "player.h"
 #include "bullet.h"
 #include "enemy.h"
+#include "bg.h"
+#include "road.h"
+#include "timer.h"
+
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -293,6 +298,11 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitPlayer(0);				// プレイヤーの初期化
 	InitBullet(0);				// バレットの初期化
 	InitEnemy(0);				// ENEMYの初期化
+	InitBg(0);					// BGの初期化
+	InitRoad(0);				// 道の初期化
+	InitTimer(0);				// タイマーの初期化
+
+
 #ifdef _DEBUG
 	InitDebugProc();			// デバッグ表示の初期化
 #endif
@@ -324,6 +334,10 @@ void Uninit(void)
 	UninitPlayer();				// プレイヤーの終了処理
 	UninitBullet();				// バレットの終了処理
 	UninitEnemy();				// ENEMYの終了処理
+	UninitBg();					// BGの終了処理
+	UninitRoad();				// 道の終了処理
+	UninitTimer();				// タイマーの終了処理
+
 	// デバイスの開放
 	SAFE_RELEASE(pD3DDevice);
 	// Direct3Dオブジェクトの開放
@@ -362,6 +376,9 @@ void Update(void)
 		UpdatePlayer();				// プレイヤーの更新
 		UpdateBullet();				// バレットの更新
 		UpdateEnemy();				// ENEMYの更新
+		UpdateBg();					// BGの更新
+		UpdateRoad();				// 道の更新
+		UpdateTimer();				// タイマーの更新
 		break;
 
 	case PAUSE:
@@ -404,9 +421,14 @@ void Draw(void)
 			break;
 
 		case GAME:
+			DrawBg();					// BGの描画
+			DrawRoad();					// 道の描画
 			DrawPlayer();				// プレイヤーの描画
 			DrawBullet();				// バレットの描画
 			DrawEnemy();				// ENEMYの描画
+			
+			// UI
+			DrawTimer();				// タイマーの描画
 			break;
 
 		case PAUSE:
