@@ -21,6 +21,7 @@
 #include "bg.h"
 #include "road.h"
 #include "timer.h"
+#include "score.h"
 
 
 //*****************************************************************************
@@ -301,6 +302,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitBg(0);					// BGの初期化
 	InitRoad(0);				// 道の初期化
 	InitTimer(0);				// タイマーの初期化
+	InitScore(0);				// スコア初期化
 
 
 #ifdef _DEBUG
@@ -337,6 +339,7 @@ void Uninit(void)
 	UninitBg();					// BGの終了処理
 	UninitRoad();				// 道の終了処理
 	UninitTimer();				// タイマーの終了処理
+	UninitScore();				// スコアの終了処理
 
 	// デバイスの開放
 	SAFE_RELEASE(pD3DDevice);
@@ -379,6 +382,7 @@ void Update(void)
 		UpdateBg();					// BGの更新
 		UpdateRoad();				// 道の更新
 		UpdateTimer();				// タイマーの更新
+		UpdateScore();				// スコアの更新
 		break;
 
 	case PAUSE:
@@ -429,6 +433,7 @@ void Draw(void)
 			
 			// UI
 			DrawTimer();				// タイマーの描画
+			DrawScore();				// スコアの描画
 			break;
 
 		case PAUSE:
