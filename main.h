@@ -113,13 +113,21 @@ struct  VERTEX_2D
 };
 
 
-// TRANSFORM構造体を定義●中込注：仮
+// TRANSFORM構造体を定義
 struct  TRANSFORM
 {
 	D3DXVECTOR3		pos;			// 位置
 	D3DXVECTOR3		rot;			// 回転
 	D3DXVECTOR3		scl;			// 大きさ
 };
+
+
+// ゲーム進行データセット
+struct GAMEDATA
+{
+	BOOL			isGameClear;	// ゲームのリザルト　TRUE:GameClear FALSE:GameOver
+};
+
 
 struct CHARACTER 
 {
@@ -146,6 +154,9 @@ int GetFPS(void);
 
 // 現在時刻取得
 DWORD GetTime(void);
+
+// ゲーム進行データセットを取得
+GAMEDATA *GetGameData(void);
 
 
 #endif

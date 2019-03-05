@@ -167,3 +167,12 @@ void SetTextureScore(void)
 	score.vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	score.vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 }
+
+
+//=============================================================================
+// ƒXƒRƒA‚ð‰ÁŽZ
+//=============================================================================
+void AddScore(int addValue)
+{
+	score.value += addValue;
+}
