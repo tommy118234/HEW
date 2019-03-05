@@ -12,7 +12,6 @@
 //*****************************************************************************
 #include <stdio.h>
 #include "input.h"
-#include "game_main.h"
 #include "quadrangle.h"
 #include "debugproc.h"
 

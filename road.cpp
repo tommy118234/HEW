@@ -6,6 +6,7 @@
 //=============================================================================
 #include "main.h"
 #include "input.h"
+#include "player.h"
 #include "road.h"
 
 
@@ -76,15 +77,23 @@ void UninitRoad(void)
 //=============================================================================
 void UpdateRoad(void)
 {
+	// スクロール
 	if (IsButtonPressed(0, BUTTON_RIGHT) || GetKeyboardPress(DIK_RIGHT))
 	{
-		road.pos.x -= MOVE_SPEED_X;
+		if (GetPlayer(0)->pos.x >= RIGHT_SCROLL_LINE_X)
+		{
+			road.pos.x -= MOVE_SPEED_X;
+		}
 	}
 	else if (IsButtonPressed(0, BUTTON_LEFT) || GetKeyboardPress(DIK_LEFT))
 	{
-		road.pos.x += MOVE_SPEED_X;
+		if (GetPlayer(0)->pos.x <= LEFT_SCROLL_LINE_X)
+		{
+			road.pos.x += MOVE_SPEED_X;
+		}
 	}
 
+	// ループ
 	if (road.pos.x < -ROAD_SIZE_X / 2)
 	{
 		road.pos.x = INIT_POS_X;

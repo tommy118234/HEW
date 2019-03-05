@@ -18,12 +18,17 @@
 #define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// アニメーションパターン数
 
 #define PLAYER_MAX	(1)			// プレイヤーの数
+
+// スクロール開始座標
+#define LEFT_SCROLL_LINE_X	(SCREEN_WIDTH * 0.05f)
+#define RIGHT_SCROLL_LINE_X	(SCREEN_WIDTH * 0.5f)
+
 /*******************************************************************************
 * 構造体定義
 ********************************************************************************/
 struct	PLAYER				// キャラクターの基本構造体
 {
-	CHARACTER	status;			// 共通パラメーター
+	CHARACTER	status;		// 共通パラメーター
 
 	D3DXVECTOR3				pos;					// ポリゴンの移動量
 	int						patternAnim;			// アニメーションパターンナンバー
