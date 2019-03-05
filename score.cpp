@@ -1,12 +1,12 @@
 //=============================================================================
 //
-// タイマー処理 [timer.cpp]
+// スコア処理 [score.cpp]
 // Author : HAL東京昼間部 2年制ゲーム学科 GP11B341 24 中込和輝
 //
 //=============================================================================
 #include "main.h"
 #include "input.h"
-#include "timer.h"
+#include "score.h"
 #include "font.h"
 
 
@@ -14,58 +14,50 @@
 // マクロ定義
 //*****************************************************************************
 // テクスチャ場所
-//#define TEXTURE_TIMER		_T("data/TEXTURE/timer.png")
+//#define TEXTURE_SCORE		_T("data/TEXTURE/score.png")
 
-// タイマーのサイズ
-#define TIMER_SIZE_X		(SCREEN_WIDTH * 2)
-#define TIMER_SIZE_Y		(SCREEN_HEIGHT / 5)	
+// スコアのサイズ
+#define SCORE_SIZE_X		(SCREEN_WIDTH * 2)
+#define SCORE_SIZE_Y		(SCREEN_HEIGHT / 5)	
 
-// タイマーの座標
-#define INIT_POS_X			(0.0f)
-#define INIT_POS_Y			(SCREEN_HEIGHT * 0.8f)
-#define MOVE_SPEED_X		(2.0f)
-
-// 秒
-#define INIT_REMAIN_TIME	(60)				// 残り時間
-#define SECOND_TIME			(1000)				// システム時刻上の１秒
+// スコア座標
+#define SCORE_POS_X			(800)
+#define SCORE_POS_Y			(100)
 
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT MakeVertexTimer(void);					// 頂点の作成
-void SetVertexTimer(void);						// 頂点座標の設定
-void SetColorTimer(void);						// 頂点カラーの設定
-void SetTextureTimer(void);						// テクスチャ座標の設定
+HRESULT MakeVertexScore(void);					// 頂点の作成
+void SetVertexScore(void);						// 頂点座標の設定
+void SetColorScore(void);						// 頂点カラーの設定
+void SetTextureScore(void);						// テクスチャ座標の設定
 
 
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-GAMETIMER timer;
-TCHAR text[256];
+GAMESCORE score;
+static TCHAR text[256];
 
 
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT InitTimer(int type)
+HRESULT InitScore(int type)
 {
 	if (type == 0)
 	{
 		//// テクスチャの読み込み
 		//LPDIRECT3DDEVICE9 pDevice = GetDevice();
 		//D3DXCreateTextureFromFile(pDevice,
-		//	TEXTURE_TIMER,
-		//	&timer.pTexture);
+		//	TEXTURE_SCORE,
+		//	&score.pTexture);
 	}
 
-	timer.pos = D3DXVECTOR3(INIT_POS_X, INIT_POS_Y, 0.0f);
-	timer.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	timer.currentTime = 0;
-	timer.lastTime = 0;
-	timer.displayTime = INIT_REMAIN_TIME;
-	MakeVertexTimer();
+	score.pos = D3DXVECTOR3(SCORE_POS_X, SCORE_POS_Y, 0.0f);
+	score.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	MakeVertexScore();
 
 	return S_OK;
 }
@@ -74,82 +66,68 @@ HRESULT InitTimer(int type)
 //=============================================================================
 // 終了処理
 //=============================================================================
-void UninitTimer(void)
+void UninitScore(void)
 {
-	SAFE_RELEASE(timer.pTexture)
+	SAFE_RELEASE(score.pTexture)
 }
 
 
 //=============================================================================
 // 更新処理
 //=============================================================================
-void UpdateTimer(void)
+void UpdateScore(void)
 {
-	timer.currentTime = GetTime();
 
-	// システム時刻で1秒経過ごとに表示タイムをカウントダウン
-	if ((timer.currentTime - timer.lastTime) >= SECOND_TIME)
-	{
-		timer.lastTime = timer.currentTime;
-		timer.displayTime--;
-	}
 
 	// ●仮の表示
-	wsprintf(text, _T("%d\n"), timer.displayTime);
+	wsprintf(text, _T("%d\n"), score.value);
 
-	// 時間切れ
-	if (timer.displayTime < 0)
-	{
-		timer.displayTime = 0;
-		SetStage(RESULT);
-	}
-
-	SetVertexTimer();
+	SetVertexScore();
 }
 
 
 //=============================================================================
 // 描画処理
 //=============================================================================
-void DrawTimer(void)
+void DrawScore(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	// ●仮の表示
 	LPD3DXFONT font = GetFont(IMPACT);
-	RECT rect = { SCREEN_CENTER_X, 80, SCREEN_WIDTH, SCREEN_HEIGHT };
+	RECT rect = { SCORE_POS_X, SCORE_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT };
 	font->DrawText(NULL, text, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
 
 	//// 頂点フォーマットの設定
 	//pDevice->SetFVF(FVF_VERTEX_2D);
 
 	//// テクスチャの設定
-	//pDevice->SetTexture( 0, timer.pTexture );
+	//pDevice->SetTexture( 0, score.pTexture );
 
 	//// ポリゴンの描画
-	//pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, timer.vertexWk, sizeof(VERTEX_2D));
+	//pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, score.vertexWk, sizeof(VERTEX_2D));
 }
 
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT MakeVertexTimer(void)
+HRESULT MakeVertexScore(void)
 {
 	// 頂点座標の設定	
-	SetVertexTimer();
+	SetVertexScore();
 
 	// 頂点カラーの設定
-	SetColorTimer();
+	SetColorScore();
 
 	// テクスチャ座標の設定
-	SetTextureTimer();
+	SetTextureScore();
 
 	// rhwの設定
-	timer.vertexWk[0].rhw =
-		timer.vertexWk[1].rhw =
-		timer.vertexWk[2].rhw =
-		timer.vertexWk[3].rhw = 1.0f;
+	score.vertexWk[0].rhw =
+		score.vertexWk[1].rhw =
+		score.vertexWk[2].rhw =
+		score.vertexWk[3].rhw = 1.0f;
 
 	return S_OK;
 }
@@ -158,34 +136,34 @@ HRESULT MakeVertexTimer(void)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void SetVertexTimer(void)
+void SetVertexScore(void)
 {
-	timer.vertexWk[0].vtx = D3DXVECTOR3(timer.pos.x, timer.pos.y, timer.pos.z);
-	timer.vertexWk[1].vtx = D3DXVECTOR3(timer.pos.x + TIMER_SIZE_X, timer.pos.y, timer.pos.z);
-	timer.vertexWk[2].vtx = D3DXVECTOR3(timer.pos.x, timer.pos.y + TIMER_SIZE_Y, timer.pos.z);
-	timer.vertexWk[3].vtx = D3DXVECTOR3(timer.pos.x + TIMER_SIZE_X, timer.pos.y + TIMER_SIZE_Y, timer.pos.z);
+	score.vertexWk[0].vtx = D3DXVECTOR3(score.pos.x, score.pos.y, score.pos.z);
+	score.vertexWk[1].vtx = D3DXVECTOR3(score.pos.x + SCORE_SIZE_X, score.pos.y, score.pos.z);
+	score.vertexWk[2].vtx = D3DXVECTOR3(score.pos.x, score.pos.y + SCORE_SIZE_Y, score.pos.z);
+	score.vertexWk[3].vtx = D3DXVECTOR3(score.pos.x + SCORE_SIZE_X, score.pos.y + SCORE_SIZE_Y, score.pos.z);
 }
 
 
 //=============================================================================
 // 頂点カラーの設定
 //=============================================================================
-void SetColorTimer(void)
+void SetColorScore(void)
 {
-	timer.vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	timer.vertexWk[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	timer.vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	timer.vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	score.vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	score.vertexWk[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	score.vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	score.vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 }
 
 
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void SetTextureTimer(void)
+void SetTextureScore(void)
 {
-	timer.vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	timer.vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	timer.vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	timer.vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	score.vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	score.vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	score.vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	score.vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 }
