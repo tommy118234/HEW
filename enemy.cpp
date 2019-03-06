@@ -43,7 +43,7 @@ HRESULT InitEnemy(int type)
 			TEXTURE_GAME_ENEMY2,	// ファイルの名前
 			&enemyTexture[1]);
 	}
-	for (int i = 0; i < ENEMY_MAX; i++) 
+	for (int i = 0; i < ENEMY_MAX; i++,enemy++) 
 	{
 		// プレイヤーの初期化処理	   
 		enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
@@ -54,7 +54,7 @@ HRESULT InitEnemy(int type)
 		enemy->patternAnim = 0;
 		enemy->direction = 1;
 		enemy->moving_cooldown = 0;
-		enemy->speed = 3;
+		enemy->speed = 1.0f;
 		enemy->status.ATK = 5;
 		D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
 		enemy->radius = D3DXVec2Length(&temp);
@@ -82,23 +82,25 @@ void UpdateEnemy(void)
 {
 	ENEMY *enemy = GetEnemy(0);
 	// アニメーション	
-	for (int i = 0; i < ENEMY_MAX; i++)
+	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	{
 		if (enemy->use)
 		{
-			enemy->countAnim++;
+			enemy->countAnim+=enemy->speed*0.3f;
+
+			enemy->moving_cooldown = 1;
+			//enemy->countAnim ++;
 			if (enemy->moving_cooldown > 0)
 			{
-				enemy->patternAnim = (enemy->countAnim) % ANIM_PATTERN_NUM;
+				enemy->patternAnim = (int)(enemy->countAnim) % ANIM_PATTERN_NUM;
 				// テクスチャ座標を設定
 				SetTextureEnemy(enemy->direction, enemy->patternAnim);
-				if (enemy->patternAnim == 1 || enemy->patternAnim == 6)
-					enemy->moving_cooldown--;
+				//if (enemy->patternAnim == 1 || enemy->patternAnim == 6)
+				//	enemy->moving_cooldown--;
 			}
-			enemy->pos.x--;
+			enemy->pos.x-=5;
 			if (enemy->pos.x < 0)
 				enemy->use = false;
-			enemy->moving_cooldown = 1;
 			//// 移動後の座標で頂点を設定
 			SetVertexEnemy();
 		}
@@ -199,12 +201,13 @@ void SetEnemy(void)
 									 SCREEN_CENTER_Y/4 + rand() % SCREEN_CENTER_Y,
 									 0.0f);	// 座標をセット
 			enemy->patternAnim = 0;
+			enemy->type = rand() % 2;
 			return;							// 1発セットしたので終了する
 		}
 	}
 }
 
-/*******************************************************************************
+/************************thsths*******************************************************
 関数名:	ENEMY *GetMapAdr( int pno )
 引数:	int pno : プレイヤー番号
 戻り値:	ENEMY *

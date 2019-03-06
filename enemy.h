@@ -28,7 +28,7 @@ struct	ENEMY				// キャラクターの基本構造体
 	bool					use;			// true:使用  false:未使用
 	D3DXVECTOR3				pos;			// ポリゴンの移動量
 	int						patternAnim;	// アニメーションパターンナンバー
-	int						countAnim;		// アニメーションカウント	
+	float					countAnim;		// アニメーションカウント	
 	int						type;
 	VERTEX_2D				vtx[NUM_VERTEX];// 頂点情報格納ワーク
 	float					radius;			// ポリゴンの角度	

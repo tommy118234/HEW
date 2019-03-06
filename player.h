@@ -9,15 +9,17 @@
 
 #include "main.h"
 
-#define TEXTURE_GAME_PLAYER	_T("data/TEXTURE/player.png")	// サンプル用画像
-#define TEXTURE_PLAYER_SIZE_X	(140) // テクスチャサイズ
-#define TEXTURE_PLAYER_SIZE_Y	(200) // 同上
+#define TEXTURE_GAME_PLAYER		_T("data/TEXTURE/player.png")	// サンプル用画像
+#define TEXTURE_GAME_PLAYER2	_T("data/TEXTURE/player_attack.png")	// サンプル用画像
+#define TEXTURE_PLAYER_SIZE_X	(140)							// テクスチャサイズ
+#define TEXTURE_PLAYER_SIZE_Y	(200)							// 同上
 
 #define TEXTURE_PATTERN_DIVIDE_X	(5)	// アニメパターンのテクスチャ内分割数（X)
 #define TEXTURE_PATTERN_DIVIDE_Y	(2)	// アニメパターンのテクスチャ内分割数（Y)
 #define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// アニメーションパターン数
 
-#define PLAYER_MAX	(1)			// プレイヤーの数
+#define PLAYER_MAX	(1)			// プレイヤーの数[
+#define MOVE_MAX	(2)			// プレイヤーの数
 /*******************************************************************************
 * 構造体定義
 ********************************************************************************/
@@ -27,8 +29,8 @@ struct	PLAYER				// キャラクターの基本構造体
 
 	D3DXVECTOR3				pos;					// ポリゴンの移動量
 	int						patternAnim;			// アニメーションパターンナンバー
-	float						countAnim;				// アニメーションカウント	
-	LPDIRECT3DTEXTURE9		texture = NULL;			// テクスチャへのポリゴン
+	float					countAnim;				// アニメーションカウント	
+	LPDIRECT3DTEXTURE9		texture[MOVE_MAX];			// テクスチャへのポリゴン
 	VERTEX_2D				vtx[NUM_VERTEX];		// 頂点情報格納ワーク
 	float					radius;					// ポリゴンの角度	
 	float					baseAngle;
