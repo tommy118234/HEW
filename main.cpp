@@ -12,12 +12,20 @@
 #include "input.h"
 #include "sound.h"
 #include <stdio.h>
-//#include "title.h"
 #include "font.h"
 #include "debugproc.h"
 #include "player.h"
 #include "bullet.h"
 #include "enemy.h"
+#include "bg.h"
+#include "road.h"
+#include "timer.h"
+#include "splash.h"
+#include "title.h"
+#include "result.h"
+#include "score.h"
+
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -42,6 +50,7 @@ LPDIRECT3D9			Direct3D = NULL;		// Direct3D オブジェクト
 LPDIRECT3DDEVICE9	pD3DDevice = NULL;		// Deviceオブジェクト(描画に必要)
 STAGE				stage;					// 現在のステージ
 DWORD				currentTime;			// 現在のシステム時刻
+GAMEDATA			gameData;				// ゲーム進行データセット
 #ifdef _DEBUG
 int					cntFPS;					// FPSカウンタ
 #endif
@@ -291,16 +300,26 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitPlayer(0);				// プレイヤーの初期化
 	InitBullet(0);				// バレットの初期化
 	InitEnemy(0);				// ENEMYの初期化
+	InitBg(0);					// BGの初期化
+	InitRoad(0);				// 道の初期化
+	InitTimer(0);				// タイマーの初期化
+	InitScore(0);				// スコア初期化
+	InitSplash(0);				// スプラッシュの初期化
+	InitTitle(0);				// タイトルの初期化
+	InitResult(0);				// リザルトの初期化
+
 #ifdef _DEBUG
 	InitDebugProc();			// デバッグ表示の初期化
 #endif
+
+	// gameData初期化
+	gameData.isGameClear = FALSE;
 
 	// 音量調節
 	//GetSound(BGM_BATTLE_1)->SetVolume(-200);
 
 	// 最初のステージを設定
-	//stage = TITLE;
-	stage = GAME;
+	stage = SPLASH;
 
 	return S_OK;
 }
@@ -322,21 +341,20 @@ void Uninit(void)
 	UninitPlayer();				// プレイヤーの終了処理
 	UninitBullet();				// バレットの終了処理
 	UninitEnemy();				// ENEMYの終了処理
+	UninitBg();					// BGの終了処理
+	UninitRoad();				// 道の終了処理
+	UninitTimer();				// タイマーの終了処理
+	UninitScore();				// スコアの終了処理
+	UninitSplash();				// スプラッシュの終了処理
+	UninitTitle();				// タイトルの終了処理
+	UninitResult();				// リザルトの終了処理
+
 	// デバイスの開放
 	SAFE_RELEASE(pD3DDevice);
+
 	// Direct3Dオブジェクトの開放
 	SAFE_RELEASE(Direct3D);
-	//if(pD3DDevice != NULL)
-	//{
-	//	pD3DDevice->Release();
-	//	pD3DDevice = NULL;
-	//}
-	//
-	//if(Direct3D != NULL)
-	//{
-	//	Direct3D->Release();
-	//	Direct3D = NULL;
-	//}
+
 }
 
 //=============================================================================
@@ -348,9 +366,11 @@ void Update(void)
 	switch (stage)
 	{
 	case SPLASH:
+		UpdateSplash();				// スプラッシュの更新処理
 		break;
 
 	case TITLE:
+		UpdateTitle();				// タイトルの更新処理
 		break;
 
 	case TUTORIAL:
@@ -360,12 +380,17 @@ void Update(void)
 		UpdatePlayer();				// プレイヤーの更新
 		UpdateBullet();				// バレットの更新
 		UpdateEnemy();				// ENEMYの更新
+		UpdateBg();					// BGの更新
+		UpdateRoad();				// 道の更新
+		UpdateTimer();				// タイマーの更新
+		UpdateScore();				// スコアの更新
 		break;
 
 	case PAUSE:
 		break;
 
 	case RESULT:
+		UpdateResult();				// リザルトの更新
 		break;
 
 	case EXIT:
@@ -374,7 +399,7 @@ void Update(void)
 	}
 
 #ifdef _DEBUG
-	UpdateDebugProc();			// デバッグ表示の更新
+	UpdateDebugProc();				// デバッグ表示の更新
 #endif
 }
 
@@ -393,24 +418,33 @@ void Draw(void)
 		switch (stage)
 		{
 		case SPLASH:
+			DrawSplash();				// スプラッシュの描画
 			break;
 
 		case TITLE:
+			DrawTitle();				// タイトルの描画
 			break;
 
 		case TUTORIAL:
 			break;
 
 		case GAME:
+			DrawBg();					// BGの描画
+			DrawRoad();					// 道の描画
 			DrawPlayer();				// プレイヤーの描画
 			DrawBullet();				// バレットの描画
 			DrawEnemy();				// ENEMYの描画
+			
+			// UI
+			DrawTimer();				// タイマーの描画
+			DrawScore();				// スコアの描画
 			break;
 
 		case PAUSE:
 			break;
 
 		case RESULT:
+			DrawResult();				// リザルトの描画
 			break;
 
 		case EXIT:
@@ -463,6 +497,18 @@ void SetStage(STAGE set)
 DWORD GetTime(void)
 {
 	return currentTime;
+}
+
+
+//=============================================================================
+// ゲーム進行データセットを取得
+//-----------------------------------------------------------------------------
+// 戻り値：GAMEDATA*　ゲーム進行データセットのアドレス
+// 引数  ：void
+//=============================================================================
+GAMEDATA *GetGameData(void)
+{
+	return &gameData;
 }
 
 

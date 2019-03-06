@@ -133,6 +133,17 @@ void UpdatePlayer(void)
 		player->pos.y = SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y;
 	}
 
+	// ●中込追加部分 ゴールが見えてないときはこの処理
+	// ゴールが見えているときは画面端まで移動できるらしい
+	if (player->pos.x > RIGHT_SCROLL_LINE_X)
+	{
+		player->pos.x = RIGHT_SCROLL_LINE_X;
+	}
+	else if (player->pos.x < LEFT_SCROLL_LINE_X)
+	{
+		player->pos.x = LEFT_SCROLL_LINE_X;
+	}
+
 	// 移動後の座標で頂点を設定
 	SetVertexPlayer();
 }
