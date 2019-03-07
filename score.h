@@ -18,18 +18,24 @@
 // マクロ・列挙型定義
 //*****************************************************************************
 #define ADD_SCORE_VALUE			(100)
+#define SCORE_DIGIT_MAX			(6)
 
 
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
-// スコア構造体
-struct GAMESCORE {
-	LPDIRECT3DTEXTURE9			pTexture;					// テクスチャへのポインタ
+struct DIGIT {
 	VERTEX_2D					vertexWk[NUM_VERTEX];		// 頂点情報格納ワーク
 	D3DXVECTOR3					pos;						// 座標
-	D3DXVECTOR3					rot;						// 回転
+	int							number;						// 数字
+};
 
+// スコア構造体
+struct GAMESCORE {
+	DIGIT						digit[SCORE_DIGIT_MAX];		// 桁
+	LPDIRECT3DTEXTURE9			pTexture;					// テクスチャへのポインタ
+	D3DXVECTOR3					pos;						// 座標
+	D3DXVECTOR3					rot;						// 回転
 	int							value;						// スコア値
 };
 

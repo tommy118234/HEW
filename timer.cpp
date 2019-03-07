@@ -6,6 +6,7 @@
 //=============================================================================
 #include "main.h"
 #include "input.h"
+#include "sound.h"
 #include "timer.h"
 #include "font.h"
 
@@ -13,16 +14,13 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-// テクスチャ場所
-//#define TEXTURE_TIMER		_T("data/TEXTURE/timer.png")
-
 // タイマーのサイズ
 #define TIMER_SIZE_X		(SCREEN_WIDTH * 2)
 #define TIMER_SIZE_Y		(SCREEN_HEIGHT / 5)	
 
 // タイマーの座標
-#define INIT_POS_X			(0.0f)
-#define INIT_POS_Y			(SCREEN_HEIGHT * 0.8f)
+#define INIT_POS_X			(SCREEN_CENTER_X)
+#define INIT_POS_Y			(50.0f)
 #define MOVE_SPEED_X		(2.0f)
 
 // 秒
@@ -43,7 +41,7 @@ void SetTextureTimer(void);						// テクスチャ座標の設定
 // グローバル変数
 //*****************************************************************************
 GAMETIMER timer;
-TCHAR text[256];
+static TCHAR text[256];
 
 
 //=============================================================================
@@ -51,15 +49,6 @@ TCHAR text[256];
 //=============================================================================
 HRESULT InitTimer(int type)
 {
-	if (type == 0)
-	{
-		//// テクスチャの読み込み
-		//LPDIRECT3DDEVICE9 pDevice = GetDevice();
-		//D3DXCreateTextureFromFile(pDevice,
-		//	TEXTURE_TIMER,
-		//	&timer.pTexture);
-	}
-
 	timer.pos = D3DXVECTOR3(INIT_POS_X, INIT_POS_Y, 0.0f);
 	timer.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	timer.currentTime = 0;
@@ -94,14 +83,15 @@ void UpdateTimer(void)
 		timer.displayTime--;
 	}
 
-	// ●仮の表示
+	// 数字の更新
 	wsprintf(text, _T("%d\n"), timer.displayTime);
 
 	// 時間切れ
 	if (timer.displayTime < 0)
 	{
 		timer.displayTime = 0;
-		SetStage(RESULT);
+		StopAllSound(INIT_SOUND);	// 音を全て止める
+		SetStage(RESULT);			// ステージ遷移
 	}
 
 	SetVertexTimer();
@@ -114,20 +104,9 @@ void UpdateTimer(void)
 void DrawTimer(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-
-	// ●仮の表示
 	LPD3DXFONT font = GetFont(IMPACT);
-	RECT rect = { SCREEN_CENTER_X, 80, SCREEN_WIDTH, SCREEN_HEIGHT };
+	RECT rect = { INIT_POS_X, INIT_POS_Y, SCREEN_WIDTH, SCREEN_HEIGHT };
 	font->DrawText(NULL, text, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
-
-	//// 頂点フォーマットの設定
-	//pDevice->SetFVF(FVF_VERTEX_2D);
-
-	//// テクスチャの設定
-	//pDevice->SetTexture( 0, timer.pTexture );
-
-	//// ポリゴンの描画
-	//pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, timer.vertexWk, sizeof(VERTEX_2D));
 }
 
 
