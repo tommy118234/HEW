@@ -105,8 +105,7 @@ void UpdateSplash(void)
 
 	// @スキップ
 	if (GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE)
-		|| IsButtonTriggered(0, BUTTON_A) || IsButtonTriggered(0, BUTTON_B)
-		|| IsButtonTriggered(1, BUTTON_A) || IsButtonTriggered(1, BUTTON_B))
+		|| IsButtonTriggered(0, BUTTON_A) || IsButtonTriggered(0, BUTTON_X))
 	{
 		time = END;
 	}

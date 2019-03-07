@@ -130,6 +130,7 @@
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="life.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="quadrangle.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="enemy.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="life.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="quadrangle.h" />

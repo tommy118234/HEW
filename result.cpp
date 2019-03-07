@@ -6,6 +6,7 @@
 //=============================================================================
 #include "main.h"
 #include "input.h"
+#include "sound.h"
 #include "player.h"
 #include "enemy.h"
 #include "bg.h"
@@ -33,17 +34,17 @@
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT MakeVertexResult(void);					// 頂点の作成
-void SetVertexResult(void);						// 頂点座標の設定
-void SetColorResult(void);						// 頂点カラーの設定
-void SetTextureResult(void);					// テクスチャ座標の設定
+HRESULT MakeVertexResult(void);	// 頂点の作成
+void SetVertexResult(void);		// 頂点座標の設定
+void SetColorResult(void);		// 頂点カラーの設定
+void SetTextureResult(void);	// テクスチャ座標の設定
 
 
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-GAMERESULT result;
-
+GAMERESULT	result;
+BOOL		isSoundPlay;	// 音再生するか
 
 //=============================================================================
 // 初期化処理
@@ -65,6 +66,7 @@ HRESULT InitResult(int type)
 			&result.pTexture[GAME_OVER]);
 	}
 
+	isSoundPlay = TRUE;
 	result.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	result.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	MakeVertexResult();
@@ -88,6 +90,23 @@ void UninitResult(void)
 //=============================================================================
 void UpdateResult(void)
 {
+	GAMEDATA *gameData = GetGameData();
+
+	// サウンド
+	if (isSoundPlay)
+	{
+		if (gameData->isGameClear)
+		{
+			PlayGameSound(SE_GAME_CLEAR, INIT_SOUND, NONE);
+		}
+		else
+		{
+			PlayGameSound(SE_GAME_OVER, INIT_SOUND, NONE);
+		}
+		isSoundPlay = FALSE;
+	}
+
+	// ステージ遷移
 	if (IsButtonTriggered(0, BUTTON_A) || GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
 	{
 		GetGameData()->isGameClear = FALSE;

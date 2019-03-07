@@ -24,6 +24,7 @@
 #include "title.h"
 #include "result.h"
 #include "score.h"
+#include "life.h"
 
 
 //*****************************************************************************
@@ -306,6 +307,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitRoad(0);				// 道の初期化
 	InitTimer(0);				// タイマーの初期化
 	InitScore(0);				// スコア初期化
+	InitLife(0);				// ライフの初期化
 	InitSplash(0);				// スプラッシュの初期化
 	InitTitle(0);				// タイトルの初期化
 	InitResult(0);				// リザルトの初期化
@@ -347,6 +349,7 @@ void Uninit(void)
 	UninitRoad();				// 道の終了処理
 	UninitTimer();				// タイマーの終了処理
 	UninitScore();				// スコアの終了処理
+	UninitLife();				// ライフの終了処理
 	UninitSplash();				// スプラッシュの終了処理
 	UninitTitle();				// タイトルの終了処理
 	UninitResult();				// リザルトの終了処理
@@ -379,6 +382,8 @@ void Update(void)
 		break;
 
 	case GAME:
+		PlayGameSound(BGM_GAME, CONTINUE_SOUND, LOOP);
+		//PlayGameSound(BGM_MUTEKI, CONTINUE_SOUND, LOOP);
 		UpdatePlayer();				// プレイヤーの更新
 		UpdateBullet();				// バレットの更新
 		UpdateEnemy();				// ENEMYの更新
@@ -386,6 +391,7 @@ void Update(void)
 		UpdateRoad();				// 道の更新
 		UpdateTimer();				// タイマーの更新
 		UpdateScore();				// スコアの更新
+		UpdateLife();				// ライフの更新
 		break;
 
 	case PAUSE:
@@ -440,6 +446,7 @@ void Draw(void)
 			// UI
 			DrawTimer();				// タイマーの描画
 			DrawScore();				// スコアの描画
+			DrawLife();					// ライフの描画
 			break;
 
 		case PAUSE:

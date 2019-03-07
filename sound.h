@@ -22,16 +22,21 @@
 //*****************************************************************************
 enum SOUND_NAME	//サウンドテーブル --------------------------------------------
 {	// SE
-
-	// ME
+	SE_ATTACK,
+	SE_GAME_CLEAR,
+	SE_GAME_OVER,
+	SE_ITEM_GET,
+	SE_DAMAGE_PLAYER,
+	SE_DAMAGE_TARGET,
+	SE_WALK,
 
 	// BGM
 	BGM_TITLE,
-
+	BGM_GAME,
+	BGM_MUTEKI,
 //-----------------------------------------------------------------------------
 	SOUND_MAX			// サウンドの数
 };
-
 
 
 enum SOUND_PLAY_TYPE

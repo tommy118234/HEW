@@ -34,7 +34,11 @@ HRESULT InitPlayer(int type)
 		// テクスチャの読み込み
 		D3DXCreateTextureFromFile(pDevice,				// デバイスのポインタ
 								  TEXTURE_GAME_PLAYER,	// ファイルの名前
-								  &player->texture);
+								  &player->texture[0]);
+
+		D3DXCreateTextureFromFile(pDevice,				// デバイスのポインタ
+								  TEXTURE_GAME_PLAYER2,	// ファイルの名前
+								  &player->texture[1]);
 	}
 	// プレイヤーの初期化処理	   
 	player->pos = D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y, 0.0f);
@@ -42,7 +46,7 @@ HRESULT InitPlayer(int type)
 	player->patternAnim = 0;
 	player->direction = 1;
 	player->moving_cooldown = 0;
-	player->speed = 3;
+	player->speed = 1.0f;
 	player->status.ATK = 5;
 	D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X, TEXTURE_PLAYER_SIZE_Y);
 	player->radius = D3DXVec2Length(&temp);
@@ -58,7 +62,8 @@ HRESULT InitPlayer(int type)
 void UninitPlayer(void)
 {
 	PLAYER *player = GetPlayer(0);	
-	SAFE_RELEASE(player->texture);
+	SAFE_RELEASE(player->texture[0]);
+	SAFE_RELEASE(player->texture[1]);
 }
 
 //=============================================================================
@@ -153,7 +158,11 @@ void DrawPlayer(void)
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 	// テクスチャの設定
-	pDevice->SetTexture( 0, player->texture);
+	BULLET *bullet = GetBullet(0);
+	if (bullet->use)
+		pDevice->SetTexture(0, player->texture[1]);
+	else
+		pDevice->SetTexture( 0, player->texture[0]);
 	// ポリゴンの描画
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, player->vtx, sizeof(VERTEX_2D));	
 	PrintDebugProc(1,"Dir:%d", player->direction);

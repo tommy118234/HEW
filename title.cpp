@@ -6,6 +6,7 @@
 //=============================================================================
 #include "main.h"
 #include "input.h"
+#include "sound.h"
 #include "player.h"
 #include "title.h"
 
@@ -77,9 +78,14 @@ void UninitTitle(void)
 //=============================================================================
 void UpdateTitle(void)
 {
-	if (IsButtonTriggered(0, BUTTON_A) || GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
+	// BGM再生
+	PlayGameSound(BGM_TITLE, CONTINUE_SOUND, LOOP);
+
+	if (IsButtonTriggered(0, BUTTON_A) || IsButtonTriggered(0, BUTTON_X)
+		|| GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
 	{
-		SetStage(GAME);
+		StopAllSound(INIT_SOUND);	// 音を全て止める
+		SetStage(GAME);				// ステージ遷移
 	}
 }
 
