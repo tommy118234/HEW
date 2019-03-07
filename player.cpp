@@ -71,9 +71,13 @@ void UninitPlayer(void)
 //=============================================================================
 void UpdatePlayer(void)
 {			
+	float speed_boost=1;
 	PLAYER *player = GetPlayer(0);
+
+	if (GetKeyboardPress(DIK_LCONTROL) || GetKeyboardPress(DIK_RCONTROL) || IsButtonPressed(0, BUTTON_Y))
+		speed_boost = 2.0f;
 	// アニメーション	
-	player->countAnim+= player->speed*0.1f;
+	player->countAnim+= player->speed * speed_boost*0.1f;
 	if (player->moving_cooldown > 0)
 	{
 		player->patternAnim = (int)(player->countAnim) % ANIM_PATTERN_NUM;
@@ -86,24 +90,24 @@ void UpdatePlayer(void)
 	if (GetKeyboardPress(DIK_DOWN) || IsButtonPressed(0, BUTTON_DOWN))
 	{
 		player->moving_cooldown = 1;
-		player->pos.y += player->speed;
+		player->pos.y += player->speed * speed_boost;
 	}
 	if (GetKeyboardPress(DIK_UP) ||	IsButtonPressed(0, BUTTON_UP))
 	{
 		player->moving_cooldown = 1;
-		player->pos.y -= player->speed;
+		player->pos.y -= player->speed * speed_boost;
 	}
 	if (GetKeyboardPress(DIK_LEFT) || IsButtonPressed(0, BUTTON_LEFT)) 
 	{
 		player->moving_cooldown = 1;
 		player->direction = -1;
-		player->pos.x -= player->speed;
+		player->pos.x -= player->speed * speed_boost;
 	}
 	if (GetKeyboardPress(DIK_RIGHT)	|| IsButtonPressed(0, BUTTON_RIGHT))
 	{
 		player->moving_cooldown = 1;
 		player->direction = 1;
-		player->pos.x += player->speed;
+		player->pos.x += player->speed * speed_boost;
 	}
 	if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTriggered(0, BUTTON_A))
 	{
@@ -114,6 +118,8 @@ void UpdatePlayer(void)
 			player_centre.x = player->pos.x + TEXTURE_PLAYER_SIZE_X;
 		player_centre.y = player->pos.y + TEXTURE_PLAYER_SIZE_Y;
 		SetBullet(player_centre,player->status.ATK, player->direction);
+
+		//SetBullet(player->pos, player->status.ATK, player->direction);
 	}
 	if (player->pos.x < 0)
 	{
@@ -162,10 +168,9 @@ void DrawPlayer(void)
 	if (bullet->use)
 		pDevice->SetTexture(0, player->texture[1]);
 	else
-		pDevice->SetTexture( 0, player->texture[0]);
+		pDevice->SetTexture(0, player->texture[0]);
 	// ポリゴンの描画
-	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, player->vtx, sizeof(VERTEX_2D));	
-	PrintDebugProc(1,"Dir:%d", player->direction);
+	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, player->vtx, sizeof(VERTEX_2D));
 }
 
 //=============================================================================

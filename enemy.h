@@ -18,7 +18,7 @@
 #define TEXTURE_PATTERN_DIVIDE_Y	(2)	// アニメパターンのテクスチャ内分割数（Y)
 #define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// アニメーションパターン数
 
-#define ENEMY_MAX	(10)			// プレイヤーの数
+#define ENEMY_MAX	(4)			// プレイヤーの数
 /*******************************************************************************
 * 構造体定義
 ********************************************************************************/

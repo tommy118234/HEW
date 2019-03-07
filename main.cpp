@@ -41,7 +41,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow);
 void Uninit(void);
 void Update(void);
 void Draw(void);
-
+void CheckHit(void);
 
 //*****************************************************************************
 // グローバル変数:
@@ -384,6 +384,7 @@ void Update(void)
 		UpdateRoad();				// 道の更新
 		UpdateTimer();				// タイマーの更新
 		UpdateScore();				// スコアの更新
+		CheckHit();
 		break;
 
 	case PAUSE:
@@ -414,6 +415,7 @@ void Draw(void)
 
 	PLAYER *player = GetPlayer(0);
 	ENEMY  *enemy = GetEnemy(0);
+	BULLET  *bullet = GetBullet(0);
 
 	// Direct3Dによる描画の開始
 	if(SUCCEEDED(pD3DDevice->BeginScene()))
@@ -449,6 +451,7 @@ void Draw(void)
 			// UI
 			DrawTimer();				// タイマーの描画
 			DrawScore();				// スコアの描画
+
 			break;
 
 		case PAUSE:
@@ -521,7 +524,92 @@ GAMEDATA *GetGameData(void)
 {
 	return &gameData;
 }
+//=============================================================================
+// BBによる当たり判定処理
+// 回転は考慮しない 
+// 戻り値：当たってたらtrue
+//=============================================================================
+bool CheckHitBB(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, D3DXVECTOR2 size1, D3DXVECTOR2 size2)
+{	
+	if (pos1.x > pos2.x && pos1.x+size1.x < pos2.x + size2.x &&
+ 		pos1.y > pos2.y && pos1.y+size1.y < pos2.y + size2.y)
+	{
+		return true;
+	}
+	return false;
+}
+//=============================================================================
+// BCによる当たり判定処理
+// posは円の中心、radiusは半径
+// 戻り値：当たってたらtrue
+//=============================================================================
+bool CheckHitBC(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, float radius1, float radius2)
+{
+	if ((radius1 + radius2) * (radius1 + radius2) >=
+		((pos2.x - pos1.x) * (pos2.x - pos1.x) + (pos2.y - pos1.y) * (pos2.y - pos1.y)) + (pos2.z - pos1.z)*(pos2.z - pos1.z))
+	{
+		return true;
+	}
+	return false;
+}
 
+//=============================================================================
+// 当たり判定処理
+//=============================================================================
+void CheckHit(void)
+{
+	PLAYER *player = GetPlayer(0);			// エネミーのポインターを初期化
+	ENEMY *enemy = GetEnemy(0);				// エネミーのポインターを初期化
+	BULLET *bullet = GetBullet(0);			// バレットのポインターを初期化
+
+	D3DXVECTOR3 player_center, enemy_center, bullet_center;
+	D3DXVECTOR2 player_size = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X, TEXTURE_PLAYER_SIZE_Y);
+	D3DXVECTOR2 enemy_size = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
+	D3DXVECTOR2 bullet_size = D3DXVECTOR2(TEXTURE_BULLET_SIZE_X, TEXTURE_BULLET_SIZE_Y);
+
+
+	// 敵と操作キャラ(BB)
+	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
+	{
+		if (enemy->use == false)	continue;
+
+		if (CheckHitBB(player->pos, enemy->pos, player_size ,enemy_size))
+		//if (CheckHitBC(player->pos, enemy->pos, player->radius, enemy->radius))
+		{
+			//enemy->use = false;
+			player->status.HP --;
+			//player->pos = D3DXVECTOR3(SCREEN_WIDTH / 2 - TEXTURE_PLAYER_SIZE_X / 2, SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y, 0.0f);
+		}
+	}
+
+	// ボスと弾(BC) // bullet(heavy) inner loop, enemy(light) outer loop
+	enemy = GetEnemy(0);					// エネミーのポインターを初期化
+	for (int j = 0; j < ENEMY_MAX; j++, enemy++)
+	{
+		if (enemy->use == false) continue;
+		for (int i = 0; i < BULLET_MAX; i++, bullet++)
+		{
+			if (bullet->use == false) continue;
+			if (CheckHitBB(bullet->pos, enemy->pos, bullet_size*2, enemy_size)||
+				CheckHitBB(enemy->pos, bullet->pos , enemy_size,bullet_size*2))
+
+			//if (CheckHitBC(bullet->pos, enemy->pos, bullet->radius, enemy->radius))
+			{
+				//bullet->use = false;		// 弾の消滅処理を行い
+				//敵HP減少アニメ
+				if (enemy->type == 1)
+					enemy->use = false;
+				else
+					enemy->direction = 1;
+			}
+		}
+	}
+	//PrintDebugProc(2, "Bullet(x,y):%f,%f	Enemy(x,y)%f,%f", bullet->pos.x, bullet->pos.y, enemy->pos.x, enemy->pos.y);
+
+
+	PrintDebugProc(1, "Bullet(%f,%f)\nEnemy(%f,%f)\n", bullet->pos.x, bullet->pos.y, enemy->pos.x, enemy->pos.y);
+	PrintDebugProc(1, "Enemy_Size(%f,%f)\n Bullet_Size(%f,%f)\n", enemy_size.x, enemy_size.y, bullet_size.x, bullet_size.y);
+}
 
 #ifdef _DEBUG
 //=============================================================================
