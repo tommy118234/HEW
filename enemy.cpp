@@ -54,7 +54,7 @@ HRESULT InitEnemy(int type)
 		enemy->patternAnim = 0;
 		enemy->direction = 1;
 		enemy->moving_cooldown = 0;
-		enemy->speed = 3;
+		enemy->speed = 1.0f;
 		enemy->status.ATK = 5;
 		D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
 		enemy->radius = D3DXVec2Length(&temp);
@@ -86,7 +86,7 @@ void UpdateEnemy(void)
 	{
 		if (enemy->use)
 		{
-			enemy->countAnim+=enemy->speed*0.1f;
+			enemy->countAnim+=enemy->speed*0.3f;
 
 			enemy->moving_cooldown = 1;
 			//enemy->countAnim ++;
@@ -207,7 +207,7 @@ void SetEnemy(void)
 	}
 }
 
-/*******************************************************************************
+/************************thsths*******************************************************
 関数名:	ENEMY *GetMapAdr( int pno )
 引数:	int pno : プレイヤー番号
 戻り値:	ENEMY *
