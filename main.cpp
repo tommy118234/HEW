@@ -1,12 +1,12 @@
 //=============================================================================
-// ���C������ [main.cpp]
+// メイン処理 [main.cpp]
 //
-// Author : GP11B341 24 �����a�P
-// �쐬�� : 2019/2/25
+// Author : GP11B341 24 中込和輝
+// 作成日 : 2019/2/25
 //=============================================================================
 
 //*****************************************************************************
-// �C���N���[�h
+// インクルード
 //*****************************************************************************
 #include "main.h"
 #include "input.h"
@@ -28,44 +28,44 @@
 
 
 //*****************************************************************************
-// �}�N����`
+// マクロ定義
 //*****************************************************************************
-#define CLASS_NAME		"Team Adult Game"	// �E�C���h�E�̃N���X��
-#define WINDOW_NAME		"Team Adult Game"	// �E�C���h�E�̃L���v�V������
+#define CLASS_NAME		"Team Adult Game"	// ウインドウのクラス名
+#define WINDOW_NAME		"Team Adult Game"	// ウインドウのキャプション名
 
 
 //*****************************************************************************
-// �v���g�^�C�v�錾
+// プロトタイプ宣言
 //*****************************************************************************
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow);
 void Uninit(void);
 void Update(void);
 void Draw(void);
-
+void CheckHit(void);
 
 //*****************************************************************************
-// �O���[�o���ϐ�:
+// グローバル変数:
 //*****************************************************************************
-LPDIRECT3D9			Direct3D = NULL;		// Direct3D �I�u�W�F�N�g
-LPDIRECT3DDEVICE9	pD3DDevice = NULL;		// Device�I�u�W�F�N�g(�`��ɕK�v)
-STAGE				stage;					// ���݂̃X�e�[�W
-DWORD				currentTime;			// ���݂̃V�X�e������
-GAMEDATA			gameData;				// �Q�[���i�s�f�[�^�Z�b�g
+LPDIRECT3D9			Direct3D = NULL;		// Direct3D オブジェクト
+LPDIRECT3DDEVICE9	pD3DDevice = NULL;		// Deviceオブジェクト(描画に必要)
+STAGE				stage;					// 現在のステージ
+DWORD				currentTime;			// 現在のシステム時刻
+GAMEDATA			gameData;				// ゲーム進行データセット
 #ifdef _DEBUG
-int					cntFPS;					// FPS�J�E���^
+int					cntFPS;					// FPSカウンタ
 #endif
 
 
 //=============================================================================
-// ���C���֐�
+// メイン関数
 //=============================================================================
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	UNREFERENCED_PARAMETER(hPrevInstance);	// �����Ă��ǂ����ǁA�x�����o��i���g�p�錾�j
-	UNREFERENCED_PARAMETER(lpCmdLine);		// �����Ă��ǂ����ǁA�x�����o��i���g�p�錾�j
+	UNREFERENCED_PARAMETER(hPrevInstance);	// 無くても良いけど、警告が出る（未使用宣言）
+	UNREFERENCED_PARAMETER(lpCmdLine);		// 無くても良いけど、警告が出る（未使用宣言）
 
-	// ���Ԍv��
+	// 時間計測
 	DWORD execLastTime;
 	DWORD fpsLastTime;
 	DWORD frameCount;
@@ -88,10 +88,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	HWND hWnd;
 	MSG msg;
 	
-	// �E�B���h�E�N���X�̓o�^
+	// ウィンドウクラスの登録
 	RegisterClassEx(&wcex);
 
-	// �E�B���h�E�̍쐬
+	// ウィンドウの作成
 	hWnd = CreateWindowEx(0,
 						CLASS_NAME,
 						WINDOW_NAME,
@@ -105,36 +105,36 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 						hInstance,
 						NULL);
 
-	// ����������(�E�B���h�E���쐬���Ă���s��)
+	// 初期化処理(ウィンドウを作成してから行う)
 	if(FAILED(Init(hInstance, hWnd, TRUE)))
 	{
 		return -1;
 	}
 
-	//�t���[���J�E���g������
-	timeBeginPeriod(1);				// ����\��ݒ�
+	//フレームカウント初期化
+	timeBeginPeriod(1);				// 分解能を設定
 	execLastTime = 
 	fpsLastTime = timeGetTime();
 	currentTime = 0;
 	frameCount = 0;
 
-	// �E�C���h�E�̕\��(�����������̌�ɌĂ΂Ȃ��Ƒʖ�)
+	// ウインドウの表示(初期化処理の後に呼ばないと駄目)
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 	
-	// ���b�Z�[�W���[�v
+	// メッセージループ
 	while(1)
 	{
 
 		if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			if(msg.message == WM_QUIT)
-			{// PostQuitMessage()���Ă΂ꂽ�烋�[�v�I��
+			{// PostQuitMessage()が呼ばれたらループ終了
 				break;
 			}
 			else
 			{
-				// ���b�Z�[�W�̖|��ƃf�B�X�p�b�`
+				// メッセージの翻訳とディスパッチ
 				TranslateMessage(&msg);
 
 				DispatchMessage(&msg);
@@ -143,7 +143,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		else
 		{
 			currentTime = timeGetTime();
-			if((currentTime - fpsLastTime) >= 500)	// 0.5�b���ƂɎ��s
+			if((currentTime - fpsLastTime) >= 500)	// 0.5秒ごとに実行
 			{
 #ifdef _DEBUG
 				cntFPS =frameCount * 1000 / (currentTime - fpsLastTime);
@@ -156,10 +156,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			{
 				execLastTime = currentTime;
 
-				// �X�V����
+				// 更新処理
 				Update();
 
-				// �`�揈��
+				// 描画処理
 				Draw();
 
 				frameCount++;
@@ -167,20 +167,20 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		}
 	}
 	
-	// �E�B���h�E�N���X�̓o�^������
+	// ウィンドウクラスの登録を解除
 	UnregisterClass(CLASS_NAME, wcex.hInstance);
 
-	// �I������
+	// 終了処理
 	Uninit();
 
-	timeEndPeriod(1);				// ����\��߂�
+	timeEndPeriod(1);				// 分解能を戻す
 
 	return (int)msg.wParam;
 }
 
 
 //=============================================================================
-// �v���V�[�W��
+// プロシージャ
 //=============================================================================
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -198,131 +198,129 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
-
 	default:
 		break;
 	}
-
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 
 //=============================================================================
-// ����������
+// 初期化処理
 //=============================================================================
 HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 {
 	D3DPRESENT_PARAMETERS d3dpp;
     D3DDISPLAYMODE d3ddm;
 
-	// Direct3D�I�u�W�F�N�g�̍쐬
+	// Direct3Dオブジェクトの作成
 	Direct3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if(Direct3D == NULL)
 	{
 		return E_FAIL;
 	}
 
-	// ���݂̃f�B�X�v���C���[�h���擾
+	// 現在のディスプレイモードを取得
     if(FAILED(Direct3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm)))
 	{
 		return E_FAIL;
 	}
 
-	// �f�o�C�X�̃v���[���e�[�V�����p�����[�^�̐ݒ�
-	ZeroMemory(&d3dpp, sizeof(d3dpp));							// ���[�N���[���N���A
-	d3dpp.BackBufferCount			= 1;						// �o�b�N�o�b�t�@�̐�
-	d3dpp.BackBufferWidth			= SCREEN_WIDTH;				// �Q�[����ʃT�C�Y(��)
-	d3dpp.BackBufferHeight			= SCREEN_HEIGHT;			// �Q�[����ʃT�C�Y(����)
-	d3dpp.BackBufferFormat			= d3ddm.Format;				// �o�b�N�o�b�t�@�t�H�[�}�b�g�̓f�B�X�v���C���[�h�ɍ��킹�Ďg��
-	d3dpp.SwapEffect				= D3DSWAPEFFECT_DISCARD;	// �f���M���ɓ������ăt���b�v����
-	d3dpp.Windowed					= bWindow;					// �E�B���h�E���[�h
-	d3dpp.AutoDepthStencilFormat	= D3DFMT_D16;				// �f�v�X�o�b�t�@�Ƃ���16bit���g��
+	// デバイスのプレゼンテーションパラメータの設定
+	ZeroMemory(&d3dpp, sizeof(d3dpp));							// ワークをゼロクリア
+	d3dpp.BackBufferCount			= 1;						// バックバッファの数
+	d3dpp.BackBufferWidth			= SCREEN_WIDTH;				// ゲーム画面サイズ(幅)
+	d3dpp.BackBufferHeight			= SCREEN_HEIGHT;			// ゲーム画面サイズ(高さ)
+	d3dpp.BackBufferFormat			= d3ddm.Format;				// バックバッファフォーマットはディスプレイモードに合わせて使う
+	d3dpp.SwapEffect				= D3DSWAPEFFECT_DISCARD;	// 映像信号に同期してフリップする
+	d3dpp.Windowed					= bWindow;					// ウィンドウモード
+	d3dpp.AutoDepthStencilFormat	= D3DFMT_D16;				// デプスバッファとして16bitを使う
 
 	if(bWindow)
-	{// �E�B���h�E���[�h
-		d3dpp.FullScreen_RefreshRateInHz = 0;								// ���t���b�V�����[�g
-		d3dpp.PresentationInterval       = D3DPRESENT_INTERVAL_IMMEDIATE;	// �C���^�[�o��
+	{// ウィンドウモード
+		d3dpp.FullScreen_RefreshRateInHz = 0;								// リフレッシュレート
+		d3dpp.PresentationInterval       = D3DPRESENT_INTERVAL_IMMEDIATE;	// インターバル
 	}
 	else
-	{// �t���X�N���[�����[�h
-		d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;			// ���t���b�V�����[�g
-		d3dpp.PresentationInterval       = D3DPRESENT_INTERVAL_DEFAULT;		// �C���^�[�o��
+	{// フルスクリーンモード
+		d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;			// リフレッシュレート
+		d3dpp.PresentationInterval       = D3DPRESENT_INTERVAL_DEFAULT;		// インターバル
 	}
 
-	// �f�o�C�X�I�u�W�F�N�g�̐���
-	// [�f�o�C�X�쐬����]<�`��>��<���_����>���n�[�h�E�F�A�ōs�Ȃ�
+	// デバイスオブジェクトの生成
+	// [デバイス作成制御]<描画>と<頂点処理>をハードウェアで行なう
 	if(FAILED(Direct3D->CreateDevice(D3DADAPTER_DEFAULT,
 									D3DDEVTYPE_HAL, 
 									hWnd, 
 									D3DCREATE_HARDWARE_VERTEXPROCESSING, 
 									&d3dpp, &pD3DDevice)))
 	{
-		// ��L�̐ݒ肪���s������
-		// [�f�o�C�X�쐬����]<�`��>���n�[�h�E�F�A�ōs���A<���_����>��CPU�ōs�Ȃ�
+		// 上記の設定が失敗したら
+		// [デバイス作成制御]<描画>をハードウェアで行い、<頂点処理>はCPUで行なう
 		if(FAILED(Direct3D->CreateDevice(D3DADAPTER_DEFAULT,
 										D3DDEVTYPE_HAL, 
 										hWnd, 
 										D3DCREATE_SOFTWARE_VERTEXPROCESSING, 
 										&d3dpp, &pD3DDevice)))
 		{
-			// ��L�̐ݒ肪���s������
-			// [�f�o�C�X�쐬����]<�`��>��<���_����>��CPU�ōs�Ȃ�
+			// 上記の設定が失敗したら
+			// [デバイス作成制御]<描画>と<頂点処理>をCPUで行なう
 			if(FAILED(Direct3D->CreateDevice(D3DADAPTER_DEFAULT,
 											D3DDEVTYPE_REF,
 											hWnd, 
 											D3DCREATE_SOFTWARE_VERTEXPROCESSING, 
 											&d3dpp, &pD3DDevice)))
 			{
-				// ���������s
+				// 初期化失敗
 				return E_FAIL;
 			}
 		}
 	}
 
-	// �����_�[�X�e�[�g�p�����[�^�̐ݒ�
-    pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);				// ���ʂ��J�����O
-	pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);				// ���u�����h���s��
-	pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);			// ���\�[�X�J���[�̎w��
-	pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);		// ���f�X�e�B�l�[�V�����J���[�̎w��
+	// レンダーステートパラメータの設定
+    pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);				// 裏面をカリング
+	pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);				// αブレンドを行う
+	pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);			// αソースカラーの指定
+	pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);		// αデスティネーションカラーの指定
 
-	// �T���v���[�X�e�[�g�p�����[�^�̐ݒ�
-	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);		// �e�N�X�`���A�h���b�V���O���@(U�l)��ݒ�
-	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);		// �e�N�X�`���A�h���b�V���O���@(V�l)��ݒ�
-	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);		// �e�N�X�`���k���t�B���^���[�h��ݒ�
-	pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);		// �e�N�X�`���g��t�B���^���[�h��ݒ�
+	// サンプラーステートパラメータの設定
+	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);		// テクスチャアドレッシング方法(U値)を設定
+	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);		// テクスチャアドレッシング方法(V値)を設定
+	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);		// テクスチャ縮小フィルタモードを設定
+	pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);		// テクスチャ拡大フィルタモードを設定
 
-	// �e�N�X�`���X�e�[�W�X�e�[�g�̐ݒ�
-	pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);	// �A���t�@�u�����f�B���O����
-	pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);	// �ŏ��̃A���t�@����
-	pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);	// �Q�Ԗڂ̃A���t�@����
+	// テクスチャステージステートの設定
+	pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);	// アルファブレンディング処理
+	pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);	// 最初のアルファ引数
+	pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);	// ２番目のアルファ引数
 
-	// �Q�[���V�X�e���̏�����
-	InitInput(hInstance, hWnd);	// ���͏����̏�����
-	InitSound(hWnd);			// �T�E���h�̏�����
-	InitFont();					// �t�H���g�̏�����
-	InitPlayer(0);				// �v���C���[�̏�����
-	InitBullet(0);				// �o���b�g�̏�����
-	InitEnemy(0);				// ENEMY�̏�����
-	InitBg(0);					// BG�̏�����
-	InitRoad(0);				// ���̏�����
-	InitTimer(0);				// �^�C�}�[�̏�����
-	InitScore(0);				// �X�R�A������
-	InitLife(0);				// ���C�t�̏�����
-	InitSplash(0);				// �X�v���b�V���̏�����
-	InitTitle(0);				// �^�C�g���̏�����
-	InitResult(0);				// ���U���g�̏�����
+	// ゲームシステムの初期化
+	InitInput(hInstance, hWnd);	// 入力処理の初期化
+	InitSound(hWnd);			// サウンドの初期化
+	InitFont();					// フォントの初期化
+	InitPlayer(0);				// プレイヤーの初期化
+	InitBullet(0);				// バレットの初期化
+	InitEnemy(0);				// ENEMYの初期化
+	InitBg(0);					// BGの初期化
+	InitRoad(0);				// 道の初期化
+	InitTimer(0);				// タイマーの初期化
+	InitScore(0);				// スコア初期化
+	InitLife(0);				// ライフの初期化
+	InitSplash(0);				// スプラッシュの初期化
+	InitTitle(0);				// タイトルの初期化
+	InitResult(0);				// リザルトの初期化
 
 #ifdef _DEBUG
-	InitDebugProc();			// �f�o�b�O�\���̏�����
+	InitDebugProc();			// デバッグ表示の初期化
 #endif
 
-	// gameData������
+	// gameData初期化
 	gameData.isGameClear = FALSE;
 
-	// ���ʒ���
+	// 音量調節
 	//GetSound(BGM_BATTLE_1)->SetVolume(-200);
 
-	// �ŏ��̃X�e�[�W��ݒ�
+	// 最初のステージを設定
 	stage = SPLASH;
 
 	return S_OK;
@@ -330,52 +328,52 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 
 //=============================================================================
-// �I������
+// 終了処理
 //=============================================================================
 void Uninit(void)
 {
 #ifdef _DEBUG
-	UninitDebugProc();			// �f�o�b�O�\���̏I��
+	UninitDebugProc();			// デバッグ表示の終了
 #endif
 
-	//UninitTitle();			// �^�C�g���̏I������
-	UninitInput();				// ���͏����̏I������
-	UninitSound();				// �T�E���h�̏I������
-	UninitFont();				// �t�H���g�̏I������
-	UninitPlayer();				// �v���C���[�̏I������
-	UninitBullet();				// �o���b�g�̏I������
-	UninitEnemy();				// ENEMY�̏I������
-	UninitBg();					// BG�̏I������
-	UninitRoad();				// ���̏I������
-	UninitTimer();				// �^�C�}�[�̏I������
-	UninitScore();				// �X�R�A�̏I������
-	UninitLife();				// ���C�t�̏I������
-	UninitSplash();				// �X�v���b�V���̏I������
-	UninitTitle();				// �^�C�g���̏I������
-	UninitResult();				// ���U���g�̏I������
+	//UninitTitle();			// タイトルの終了処理
+	UninitInput();				// 入力処理の終了処理
+	UninitSound();				// サウンドの終了処理
+	UninitFont();				// フォントの終了処理
+	UninitPlayer();				// プレイヤーの終了処理
+	UninitBullet();				// バレットの終了処理
+	UninitEnemy();				// ENEMYの終了処理
+	UninitBg();					// BGの終了処理
+	UninitRoad();				// 道の終了処理
+	UninitTimer();				// タイマーの終了処理
+	UninitScore();				// スコアの終了処理
+	UninitLife();				// ライフの終了処理
+	UninitSplash();				// スプラッシュの終了処理
+	UninitTitle();				// タイトルの終了処理
+	UninitResult();				// リザルトの終了処理
 
-	// �f�o�C�X�̊J��
+	// デバイスの開放
 	SAFE_RELEASE(pD3DDevice);
 
-	// Direct3D�I�u�W�F�N�g�̊J��
+	// Direct3Dオブジェクトの開放
 	SAFE_RELEASE(Direct3D);
 
 }
 
 //=============================================================================
-// �X�V����
+// 更新処理
 //=============================================================================
 void Update(void)
 {
-	UpdateInput();					// ���͍X�V		
+	UpdateInput();					// 入力更新		
 	switch (stage)
 	{
 	case SPLASH:
-		UpdateSplash();				// �X�v���b�V���̍X�V����
+		UpdateSplash();				// スプラッシュの更新処理
 		break;
 
 	case TITLE:
-		UpdateTitle();				// �^�C�g���̍X�V����
+		UpdateTitle();				// タイトルの更新処理
 		break;
 
 	case TUTORIAL:
@@ -384,21 +382,22 @@ void Update(void)
 	case GAME:
 		PlayGameSound(BGM_GAME, CONTINUE_SOUND, LOOP);
 		//PlayGameSound(BGM_MUTEKI, CONTINUE_SOUND, LOOP);
-		UpdatePlayer();				// �v���C���[�̍X�V
-		UpdateBullet();				// �o���b�g�̍X�V
-		UpdateEnemy();				// ENEMY�̍X�V
-		UpdateBg();					// BG�̍X�V
-		UpdateRoad();				// ���̍X�V
-		UpdateTimer();				// �^�C�}�[�̍X�V
-		UpdateScore();				// �X�R�A�̍X�V
-		UpdateLife();				// ���C�t�̍X�V
+		UpdatePlayer();				// プレイヤーの更新
+		UpdateBullet();				// バレットの更新
+		UpdateEnemy();				// ENEMYの更新
+		UpdateBg();					// BGの更新
+		UpdateRoad();				// 道の更新
+		UpdateTimer();				// タイマーの更新
+		UpdateScore();				// スコアの更新
+		UpdateLife();				// ライフの更新
+		CheckHit();
 		break;
 
 	case PAUSE:
 		break;
 
 	case RESULT:
-		UpdateResult();				// ���U���g�̍X�V
+		UpdateResult();				// リザルトの更新
 		break;
 
 	case EXIT:
@@ -407,53 +406,65 @@ void Update(void)
 	}
 
 #ifdef _DEBUG
-	UpdateDebugProc();				// �f�o�b�O�\���̍X�V
+	UpdateDebugProc();				// デバッグ表示の更新
 #endif
 }
 
 
 //=============================================================================
-// �`�揈��
+// 描画処理
 //=============================================================================
 void Draw(void)
 {
-	// �o�b�N�o�b�t�@�̃N���A
+	// バックバッファのクリア
 	pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
-	// Direct3D�ɂ��`��̊J�n
+	PLAYER *player = GetPlayer(0);
+	ENEMY  *enemy = GetEnemy(0);
+	BULLET  *bullet = GetBullet(0);
+
+	// Direct3Dによる描画の開始
 	if(SUCCEEDED(pD3DDevice->BeginScene()))
 	{
 		switch (stage)
 		{
 		case SPLASH:
-			DrawSplash();				// �X�v���b�V���̕`��
+			DrawSplash();				// スプラッシュの描画
 			break;
 
 		case TITLE:
-			DrawTitle();				// �^�C�g���̕`��
+			DrawTitle();				// タイトルの描画
 			break;
 
 		case TUTORIAL:
 			break;
 
 		case GAME:
-			DrawBg();					// BG�̕`��
-			DrawRoad();					// ���̕`��
-			DrawPlayer();				// �v���C���[�̕`��
-			DrawBullet();				// �o���b�g�̕`��
-			DrawEnemy();				// ENEMY�̕`��
-			
+			DrawBg();					// BGの描画
+			DrawRoad();					// 道の描画
+			if (player->pos.y < enemy->pos.y)
+			{
+				DrawPlayer();				// プレイヤーの描画
+				DrawBullet();				// バレットの描画
+				DrawEnemy();				// ENEMYの描画
+			}
+			else
+			{
+				DrawEnemy();				// ENEMYの描画
+				DrawPlayer();				// プレイヤーの描画
+				DrawBullet();				// バレットの描画				
+			}
 			// UI
-			DrawTimer();				// �^�C�}�[�̕`��
-			DrawScore();				// �X�R�A�̕`��
-			DrawLife();					// ���C�t�̕`��
+			DrawTimer();				// タイマーの描画
+			DrawScore();				// スコアの描画
+			DrawLife();					// ライフの描画
 			break;
 
 		case PAUSE:
 			break;
 
 		case RESULT:
-			DrawResult();				// ���U���g�̕`��
+			DrawResult();				// リザルトの描画
 			break;
 
 		case EXIT:
@@ -461,23 +472,23 @@ void Draw(void)
 		}
 
 #ifdef _DEBUG
-		DrawDebugProc();		// �f�o�b�O�\���̕`��
+		DrawDebugProc();		// デバッグ表示の描画
 #endif
 
-		// Direct3D�ɂ��`��̏I��
+		// Direct3Dによる描画の終了
 		pD3DDevice->EndScene();
 	}
 
-	// �o�b�N�o�b�t�@�ƃt�����g�o�b�t�@�̓���ւ�
+	// バックバッファとフロントバッファの入れ替え
 	pD3DDevice->Present(NULL, NULL, NULL, NULL);
 }
 
 
 //=============================================================================
-// �f�o�C�X�擾�֐�
+// デバイス取得関数
 //-----------------------------------------------------------------------------
-// �߂�l�FLPDIRECT3DDEVICE9 �f�o�C�X�ւ̃|�C���^
-// ����  �Fvoid
+// 戻り値：LPDIRECT3DDEVICE9 デバイスへのポインタ
+// 引数  ：void
 //=============================================================================
 LPDIRECT3DDEVICE9 GetDevice(void)
 {
@@ -486,10 +497,10 @@ LPDIRECT3DDEVICE9 GetDevice(void)
 
 
 //=============================================================================
-// �X�e�[�W��ݒ�
+// ステージを設定
 //-----------------------------------------------------------------------------
-// �߂�l�Fvoid
-// ����  �FSTAGE�@�ݒ肷��X�e�[�W
+// 戻り値：void
+// 引数  ：STAGE　設定するステージ
 //=============================================================================
 void SetStage(STAGE set)
 {
@@ -498,10 +509,10 @@ void SetStage(STAGE set)
 
 
 //=============================================================================
-// ���ݎ����擾�擾
+// 現在時刻取得取得
 //-----------------------------------------------------------------------------
-// �߂�l�FDWORD�@���݂̃V�X�e������
-// ����  �Fvoid
+// 戻り値：DWORD　現在のシステム時刻
+// 引数  ：void
 //=============================================================================
 DWORD GetTime(void)
 {
@@ -510,23 +521,108 @@ DWORD GetTime(void)
 
 
 //=============================================================================
-// �Q�[���i�s�f�[�^�Z�b�g���擾
+// ゲーム進行データセットを取得
 //-----------------------------------------------------------------------------
-// �߂�l�FGAMEDATA*�@�Q�[���i�s�f�[�^�Z�b�g�̃A�h���X
-// ����  �Fvoid
+// 戻り値：GAMEDATA*　ゲーム進行データセットのアドレス
+// 引数  ：void
 //=============================================================================
 GAMEDATA *GetGameData(void)
 {
 	return &gameData;
 }
+//=============================================================================
+// BBによる当たり判定処理
+// 回転は考慮しない 
+// 戻り値：当たってたらtrue
+//=============================================================================
+bool CheckHitBB(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, D3DXVECTOR2 size1, D3DXVECTOR2 size2)
+{	
+	if (pos1.x > pos2.x && pos1.x+size1.x < pos2.x + size2.x &&
+ 		pos1.y > pos2.y && pos1.y+size1.y < pos2.y + size2.y)
+	{
+		return true;
+	}
+	return false;
+}
+//=============================================================================
+// BCによる当たり判定処理
+// posは円の中心、radiusは半径
+// 戻り値：当たってたらtrue
+//=============================================================================
+bool CheckHitBC(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, float radius1, float radius2)
+{
+	if ((radius1 + radius2) * (radius1 + radius2) >=
+		((pos2.x - pos1.x) * (pos2.x - pos1.x) + (pos2.y - pos1.y) * (pos2.y - pos1.y)) + (pos2.z - pos1.z)*(pos2.z - pos1.z))
+	{
+		return true;
+	}
+	return false;
+}
 
+//=============================================================================
+// 当たり判定処理
+//=============================================================================
+void CheckHit(void)
+{
+	PLAYER *player = GetPlayer(0);			// エネミーのポインターを初期化
+	ENEMY *enemy = GetEnemy(0);				// エネミーのポインターを初期化
+	BULLET *bullet = GetBullet(0);			// バレットのポインターを初期化
+
+	D3DXVECTOR3 player_center, enemy_center, bullet_center;
+	D3DXVECTOR2 player_size = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X, TEXTURE_PLAYER_SIZE_Y);
+	D3DXVECTOR2 enemy_size = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
+	D3DXVECTOR2 bullet_size = D3DXVECTOR2(TEXTURE_BULLET_SIZE_X, TEXTURE_BULLET_SIZE_Y);
+
+
+	// 敵と操作キャラ(BB)
+	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
+	{
+		if (enemy->use == false)	continue;
+
+		if (CheckHitBB(player->pos, enemy->pos, player_size ,enemy_size))
+		//if (CheckHitBC(player->pos, enemy->pos, player->radius, enemy->radius))
+		{
+			//enemy->use = false;
+			player->status.HP --;
+			//player->pos = D3DXVECTOR3(SCREEN_WIDTH / 2 - TEXTURE_PLAYER_SIZE_X / 2, SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y, 0.0f);
+		}
+	}
+
+	// ボスと弾(BC) // bullet(heavy) inner loop, enemy(light) outer loop
+	enemy = GetEnemy(0);					// エネミーのポインターを初期化
+	for (int j = 0; j < ENEMY_MAX; j++, enemy++)
+	{
+		if (enemy->use == false) continue;
+		for (int i = 0; i < BULLET_MAX; i++, bullet++)
+		{
+			if (bullet->use == false) continue;
+			if (CheckHitBB(bullet->pos, enemy->pos, bullet_size*2, enemy_size)||
+				CheckHitBB(enemy->pos, bullet->pos , enemy_size,bullet_size*2))
+
+			//if (CheckHitBC(bullet->pos, enemy->pos, bullet->radius, enemy->radius))
+			{
+				//bullet->use = false;		// 弾の消滅処理を行い
+				//敵HP減少アニメ
+				if (enemy->type == 1)
+					enemy->use = false;
+				else
+					enemy->direction = 1;
+			}
+		}
+	}
+	//PrintDebugProc(2, "Bullet(x,y):%f,%f	Enemy(x,y)%f,%f", bullet->pos.x, bullet->pos.y, enemy->pos.x, enemy->pos.y);
+
+
+	PrintDebugProc(1, "Bullet(%f,%f)\nEnemy(%f,%f)\n", bullet->pos.x, bullet->pos.y, enemy->pos.x, enemy->pos.y);
+	PrintDebugProc(1, "Enemy_Size(%f,%f)\n Bullet_Size(%f,%f)\n", enemy_size.x, enemy_size.y, bullet_size.x, bullet_size.y);
+}
 
 #ifdef _DEBUG
 //=============================================================================
-// FPS�擾
+// FPS取得
 //-----------------------------------------------------------------------------
-// �߂�l�Fint�@���݂̃t���[�����[�g
-// ����  �Fvoid
+// 戻り値：int　現在のフレームレート
+// 引数  ：void
 //=============================================================================
 int GetFPS(void)
 {

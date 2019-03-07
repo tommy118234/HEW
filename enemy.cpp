@@ -1,7 +1,7 @@
 //=============================================================================
 //
-// ƒvƒŒ[ƒ„[ˆ— [enemy.cpp]
-// Author : ™@ƒƒC‰„
+// ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼å‡¦ç† [enemy.cpp]
+// Author : å¾ã€€ãƒ¯ã‚¤å»¶
 //
 //=============================================================================
 #include "enemy.h"
@@ -9,65 +9,70 @@
 #include "bullet.h"
 #include "debugproc.h"
 #include "math.h"
+
+#include "time.h"
 //*****************************************************************************
-// ƒ}ƒNƒ’è‹`
+// ãƒã‚¯ãƒ­å®šç¾©
 //*****************************************************************************
 //*****************************************************************************
-// ƒvƒƒgƒ^ƒCƒvéŒ¾
+// ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 //*****************************************************************************
-HRESULT	 MakeVertexEnemy(void);
-void	 SetVertexEnemy(void);
+HRESULT	 MakeVertexEnemy(int no);
+void	 SetVertexEnemy(int no);
 void	 SetTextureEnemy(int no, int cntPattern);
 void	 SetEnemy(void);
 //*****************************************************************************
-// ƒOƒ[ƒoƒ‹•Ï”
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
 //*****************************************************************************
 ENEMY	 enemy[ENEMY_MAX];
-LPDIRECT3DTEXTURE9 enemyTexture[2];//“ñ‚Â‚ÌENEMY
+LPDIRECT3DTEXTURE9 enemyTexture[2];//äºŒã¤ã®ENEMY
+int		 enemy_count,enemy_rate;
 //=============================================================================
-// ‰Šú‰»ˆ—
+// åˆæœŸåŒ–å‡¦ç†
 //=============================================================================
 HRESULT InitEnemy(int type)
 {
+	srand(time(NULL));
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	ENEMY *enemy = GetEnemy(0);	// ƒvƒŒƒCƒ„[‚O”Ô‚ÌƒAƒhƒŒƒX‚ğæ“¾‚·‚é	
-	// ƒeƒNƒXƒ`ƒƒ[‚Ì‰Šú‰»‚ğs‚¤H
+	ENEMY *enemy = GetEnemy(0);	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ï¼ç•ªã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹	
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ã®åˆæœŸåŒ–ã‚’è¡Œã†ï¼Ÿ
 	if (type == 0)
 	{
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
-		D3DXCreateTextureFromFile(pDevice,				// ƒfƒoƒCƒX‚Ìƒ|ƒCƒ“ƒ^
-			TEXTURE_GAME_ENEMY1,	// ƒtƒ@ƒCƒ‹‚Ì–¼‘O
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­ã¿è¾¼ã¿
+		D3DXCreateTextureFromFile(pDevice,				// ãƒ‡ãƒã‚¤ã‚¹ã®ãƒã‚¤ãƒ³ã‚¿
+			TEXTURE_GAME_ENEMY1,	// ãƒ•ã‚¡ã‚¤ãƒ«ã®åå‰
 			&enemyTexture[0]);
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
-		D3DXCreateTextureFromFile(pDevice,				// ƒfƒoƒCƒX‚Ìƒ|ƒCƒ“ƒ^
-			TEXTURE_GAME_ENEMY2,	// ƒtƒ@ƒCƒ‹‚Ì–¼‘O
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­ã¿è¾¼ã¿
+		D3DXCreateTextureFromFile(pDevice,				// ãƒ‡ãƒã‚¤ã‚¹ã®ãƒã‚¤ãƒ³ã‚¿
+			TEXTURE_GAME_ENEMY2,	// ãƒ•ã‚¡ã‚¤ãƒ«ã®åå‰
 			&enemyTexture[1]);
 	}
 	for (int i = 0; i < ENEMY_MAX; i++,enemy++) 
 	{
-		// ƒvƒŒƒCƒ„[‚Ì‰Šú‰»ˆ—	   
+		// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åˆæœŸåŒ–å‡¦ç†	   
 		enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
 								 SCREEN_CENTER_Y/4 + rand() % SCREEN_CENTER_Y,
 								 0.0f);
-		enemy->use = false;
+		enemy->use = FALSE;
 		enemy->countAnim = 0;
 		enemy->patternAnim = 0;
-		enemy->direction = 1;
 		enemy->moving_cooldown = 0;
 		enemy->speed = 1.0f;
 		enemy->status.ATK = 5;
 		D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
 		enemy->radius = D3DXVec2Length(&temp);
-		enemy->baseAngle = atan2f(TEXTURE_ENEMY_SIZE_Y, TEXTURE_ENEMY_SIZE_X);	// ƒvƒŒƒCƒ„[‚ÌŠp“x‚ğ‰Šú‰»
+		enemy->baseAngle = atan2f(TEXTURE_ENEMY_SIZE_Y, TEXTURE_ENEMY_SIZE_X);	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®è§’åº¦ã‚’åˆæœŸåŒ–
 		enemy->type = rand()%2;
-		// ’¸“_î•ñ‚Ìì¬
-		MakeVertexEnemy();
+		// é ‚ç‚¹æƒ…å ±ã®ä½œæˆ
+		MakeVertexEnemy(i);
 	}
+	enemy_count = 0;
+	enemy_rate = 100;
 	return S_OK;
 }
 
 //=============================================================================
-// I—¹ˆ—
+// çµ‚äº†å‡¦ç†
 //=============================================================================
 void UninitEnemy(void)
 {
@@ -76,43 +81,42 @@ void UninitEnemy(void)
 }
 
 //=============================================================================
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 //=============================================================================
 void UpdateEnemy(void)
 {
 	ENEMY *enemy = GetEnemy(0);
-	// ƒAƒjƒ[ƒVƒ‡ƒ“	
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³	
 	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	{
 		if (enemy->use)
 		{
-			enemy->countAnim+=enemy->speed*0.3f;
-
-			enemy->moving_cooldown = 1;
-			//enemy->countAnim ++;
-			if (enemy->moving_cooldown > 0)
-			{
+			enemy->countAnim += enemy->speed * 0.3f;
+			//enemy->moving_cooldown = 1;
+			////enemy->countAnim ++;
+			//if (enemy->moving_cooldown > 0)
+			//{
 				enemy->patternAnim = (int)(enemy->countAnim) % ANIM_PATTERN_NUM;
-				// ƒeƒNƒXƒ`ƒƒÀ•W‚ğİ’è
-				SetTextureEnemy(enemy->direction, enemy->patternAnim);
-				//if (enemy->patternAnim == 1 || enemy->patternAnim == 6)
-				//	enemy->moving_cooldown--;
-			}
-			enemy->pos.x-=5;
-			if (enemy->pos.x < 0)
+				// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã‚’è¨­å®š
+				SetTextureEnemy(i, enemy->patternAnim);			
+			//}
+			enemy->pos.x += enemy->direction*enemy->speed * 3.0f;
+			if (enemy->pos.x < 0 || enemy->pos.x > SCREEN_WIDTH)
 				enemy->use = false;
-			//// ˆÚ“®Œã‚ÌÀ•W‚Å’¸“_‚ğİ’è
-			SetVertexEnemy();
+			//// ç§»å‹•å¾Œã®åº§æ¨™ã§é ‚ç‚¹ã‚’è¨­å®š
+			SetVertexEnemy(i);
 		}
 		else
 		{
+			enemy_count++;
+			if (enemy_count>enemy_rate)			
 			SetEnemy();
 		}
 	}
 }
 
 //=============================================================================
-// •`‰æˆ—
+// æç”»å‡¦ç†
 //=============================================================================
 void DrawEnemy(void)
 {
@@ -120,98 +124,114 @@ void DrawEnemy(void)
 	ENEMY *enemy = GetEnemy(0);
 	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	{
-		if (enemy->use)					// g—p‚µ‚Ä‚¢‚éó‘Ô‚È‚çXV‚·‚é
+		if (enemy->use)					// ä½¿ç”¨ã—ã¦ã„ã‚‹çŠ¶æ…‹ãªã‚‰æ›´æ–°ã™ã‚‹
 		{
-			// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+			// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®š
 			pDevice->SetTexture(0, enemyTexture[enemy->type]);
-			// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+			// ãƒãƒªã‚´ãƒ³ã®æç”»
 			pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_BULLET, enemy->vtx, sizeof(VERTEX_2D));
 		}
 	}
 }
 
 //=============================================================================
-// ’¸“_‚Ìì¬
+// é ‚ç‚¹ã®ä½œæˆ
 //=============================================================================
-HRESULT MakeVertexEnemy(void)
+HRESULT MakeVertexEnemy(int no)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	ENEMY *enemy = GetEnemy(0);
-	// ’¸“_À•W‚Ìİ’è
-	SetVertexEnemy();
-	// rhw‚Ìİ’è
+	ENEMY *enemy = GetEnemy(no);
+	// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
+	SetVertexEnemy(no);
+	// rhwã®è¨­å®š
 	enemy->vtx[0].rhw =
 	enemy->vtx[1].rhw =
 	enemy->vtx[2].rhw =
 	enemy->vtx[3].rhw = 1.0f;
-	// ”½ËŒõ‚Ìİ’è
+	// åå°„å…‰ã®è¨­å®š
 	enemy->vtx[0].diffuse = 
 	enemy->vtx[1].diffuse = 
 	enemy->vtx[2].diffuse = 
 	enemy->vtx[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 	enemy->vtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
 	enemy->vtx[1].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 0.0f);
 	enemy->vtx[2].tex = D3DXVECTOR2(0.0f, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
 	enemy->vtx[3].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
-	// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
-	SetTextureEnemy(enemy->direction, enemy->patternAnim);
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®š
+	SetTextureEnemy(no, enemy->patternAnim);
 	return S_OK;
 }
 
 //=============================================================================
-// ’¸“_À•W‚Ìİ’è
+// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
 //=============================================================================
-void SetVertexEnemy(void)
+void SetVertexEnemy(int no)
 {
-	ENEMY *enemy = GetEnemy(0);
-	// ’¸“_À•W‚Ìİ’è
+	ENEMY *enemy = GetEnemy(no);
+	// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
 	enemy->vtx[0].vtx = D3DXVECTOR3(enemy->pos.x, enemy->pos.y, 0);
 	enemy->vtx[1].vtx = D3DXVECTOR3(enemy->pos.x + TEXTURE_ENEMY_SIZE_X, enemy->pos.y, 0);
 	enemy->vtx[2].vtx = D3DXVECTOR3(enemy->pos.x, enemy->pos.y + TEXTURE_ENEMY_SIZE_Y, 0);
 	enemy->vtx[3].vtx = D3DXVECTOR3(enemy->pos.x + TEXTURE_ENEMY_SIZE_X, enemy->pos.y + TEXTURE_ENEMY_SIZE_Y, 0);
 }
 //=============================================================================
-// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 //=============================================================================
-void SetTextureEnemy(int dir, int cntPattern)
+void SetTextureEnemy(int no, int cntPattern)
 {
-	ENEMY *enemy = GetEnemy(0);
-	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	ENEMY *enemy = GetEnemy(no);
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 	int x = cntPattern % TEXTURE_PATTERN_DIVIDE_X;
 	int y = cntPattern / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeX = 1.0f / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeY = 1.0f / TEXTURE_PATTERN_DIVIDE_Y;
 		
-	enemy->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-	enemy->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-	enemy->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-	enemy->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);	
+	if (enemy->direction < 0)
+	{
+		enemy->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		enemy->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		enemy->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		enemy->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	}
+	else
+	{
+		enemy->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		enemy->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		enemy->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		enemy->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	}
 }
-
+//=============================================================================
+// æ•µã®ç™ºå°„è¨­å®š
+//=============================================================================
 void SetEnemy(void)
 {
 	ENEMY *enemy = GetEnemy(0);			  
 	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	{
-		if (enemy->use == false)			// –¢g—pó‘Ô‚ÌƒoƒŒƒbƒg‚ğŒ©‚Â‚¯‚é
+		if (enemy->use == false)			// æœªä½¿ç”¨çŠ¶æ…‹ã®ãƒãƒ¬ãƒƒãƒˆã‚’è¦‹ã¤ã‘ã‚‹
 		{	
-			enemy->use = true;				// g—pó‘Ô‚Ö•ÏX‚·‚é
+			enemy->use = true;				// ä½¿ç”¨çŠ¶æ…‹ã¸å¤‰æ›´ã™ã‚‹
 			enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
 									 SCREEN_CENTER_Y/4 + rand() % SCREEN_CENTER_Y,
-									 0.0f);	// À•W‚ğƒZƒbƒg
+									 0.0f);	// åº§æ¨™ã‚’ã‚»ãƒƒãƒˆ
 			enemy->patternAnim = 0;
+			enemy->speed = 1.0f;
+			enemy->direction = -1;
 			enemy->type = rand() % 2;
-			return;							// 1”­ƒZƒbƒg‚µ‚½‚Ì‚ÅI—¹‚·‚é
+			enemy_count = 0;
+			enemy_rate = 60+rand()%41;
+			return;							// 1ç™ºã‚»ãƒƒãƒˆã—ãŸã®ã§çµ‚äº†ã™ã‚‹
 		}
 	}
 }
 
 /************************thsths*******************************************************
-ŠÖ”–¼:	ENEMY *GetMapAdr( int pno )
-ˆø”:	int pno : ƒvƒŒƒCƒ„[”Ô†
-–ß‚è’l:	ENEMY *
-à–¾:	ƒvƒŒƒCƒ„[‚ÌƒAƒhƒŒƒX‚ğæ“¾‚·‚é
+é–¢æ•°å:	ENEMY *GetMapAdr( int pno )
+å¼•æ•°:	int pno : ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç•ªå·
+æˆ»ã‚Šå€¤:	ENEMY *
+èª¬æ˜:	ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹
 *******************************************************************************/
 ENEMY *GetEnemy(int pno)
 {

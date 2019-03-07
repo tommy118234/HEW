@@ -1,7 +1,7 @@
 //=============================================================================
 //
-// ƒŠƒUƒ‹ƒgˆ— [result.cpp]
-// Author : HAL“Œ‹’‹ŠÔ•” 2”N§ƒQ[ƒ€Šw‰È GP11B341 24 ’†˜a‹P
+// ãƒªã‚¶ãƒ«ãƒˆå‡¦ç† [result.cpp]
+// Author : HALæ±äº¬æ˜¼é–“éƒ¨ 2å¹´åˆ¶ã‚²ãƒ¼ãƒ å­¦ç§‘ GP11B341 24 ä¸­è¾¼å’Œè¼
 //
 //=============================================================================
 #include "main.h"
@@ -16,51 +16,51 @@
 
 
 //*****************************************************************************
-// ƒ}ƒNƒ’è‹`
+// ãƒã‚¯ãƒ­å®šç¾©
 //*****************************************************************************
-// ƒeƒNƒXƒ`ƒƒêŠ
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£å ´æ‰€
 #define TEXTURE_GAME_CLEAR		_T("data/TEXTURE/game_clear.png")
 #define TEXTURE_GAME_OVER		_T("data/TEXTURE/game_over.png")
 
-// ƒŠƒUƒ‹ƒg‚ÌƒTƒCƒY
+// ãƒªã‚¶ãƒ«ãƒˆã®ã‚µã‚¤ã‚º
 #define RESULT_SIZE_X			(SCREEN_WIDTH)
 #define RESULT_SIZE_Y			(SCREEN_HEIGHT)	
 
-// ƒŠƒUƒ‹ƒg‚ÌÀ•W
+// ãƒªã‚¶ãƒ«ãƒˆã®åº§æ¨™
 #define INIT_POS_X				(0.0f)
 #define MOVE_SPEED_X			(1.0f)
 
 
 //*****************************************************************************
-// ƒvƒƒgƒ^ƒCƒvéŒ¾
+// ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 //*****************************************************************************
-HRESULT MakeVertexResult(void);	// ’¸“_‚Ìì¬
-void SetVertexResult(void);		// ’¸“_À•W‚Ìİ’è
-void SetColorResult(void);		// ’¸“_ƒJƒ‰[‚Ìİ’è
-void SetTextureResult(void);	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+HRESULT MakeVertexResult(void);	// é ‚ç‚¹ã®ä½œæˆ
+void SetVertexResult(void);		// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
+void SetColorResult(void);		// é ‚ç‚¹ã‚«ãƒ©ãƒ¼ã®è¨­å®š
+void SetTextureResult(void);	// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 
 
 //*****************************************************************************
-// ƒOƒ[ƒoƒ‹•Ï”
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
 //*****************************************************************************
 GAMERESULT	result;
-BOOL		isSoundPlay;	// ‰¹Ä¶‚·‚é‚©
+BOOL		isSoundPlay;	// éŸ³å†ç”Ÿã™ã‚‹ã‹
 
 //=============================================================================
-// ‰Šú‰»ˆ—
+// åˆæœŸåŒ–å‡¦ç†
 //=============================================================================
 HRESULT InitResult(int type)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒXæ“¾
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ãƒ‡ãƒã‚¤ã‚¹å–å¾—
 
 	if (type == 0)
 	{
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­ã¿è¾¼ã¿
 		D3DXCreateTextureFromFile(pDevice,
 			TEXTURE_GAME_CLEAR,
 			&result.pTexture[GAME_CLEAR]);
 
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­ã¿è¾¼ã¿
 		D3DXCreateTextureFromFile(pDevice,
 			TEXTURE_GAME_OVER,
 			&result.pTexture[GAME_OVER]);
@@ -76,7 +76,7 @@ HRESULT InitResult(int type)
 
 
 //=============================================================================
-// I—¹ˆ—
+// çµ‚äº†å‡¦ç†
 //=============================================================================
 void UninitResult(void)
 {
@@ -86,13 +86,13 @@ void UninitResult(void)
 
 
 //=============================================================================
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 //=============================================================================
 void UpdateResult(void)
 {
 	GAMEDATA *gameData = GetGameData();
 
-	// ƒTƒEƒ“ƒh
+	// ã‚µã‚¦ãƒ³ãƒ‰
 	if (isSoundPlay)
 	{
 		if (gameData->isGameClear)
@@ -106,7 +106,7 @@ void UpdateResult(void)
 		isSoundPlay = FALSE;
 	}
 
-	// ƒXƒe[ƒW‘JˆÚ
+	// ã‚¹ãƒ†ãƒ¼ã‚¸é·ç§»
 	if (IsButtonTriggered(0, BUTTON_A) || GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
 	{
 		GetGameData()->isGameClear = FALSE;
@@ -121,16 +121,16 @@ void UpdateResult(void)
 
 
 //=============================================================================
-// •`‰æˆ—
+// æç”»å‡¦ç†
 //=============================================================================
 void DrawResult(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// ’¸“_ƒtƒH[ƒ}ƒbƒg‚Ìİ’è
+	// é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®è¨­å®š
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®š
 	if (GetGameData()->isGameClear)
 	{
 		pDevice->SetTexture(0, result.pTexture[GAME_CLEAR]);
@@ -140,26 +140,26 @@ void DrawResult(void)
 		pDevice->SetTexture(0, result.pTexture[GAME_OVER]);
 	}
 
-	// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+	// ãƒãƒªã‚´ãƒ³ã®æç”»
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, result.vertexWk, sizeof(VERTEX_2D));
 }
 
 
 //=============================================================================
-// ’¸“_‚Ìì¬
+// é ‚ç‚¹ã®ä½œæˆ
 //=============================================================================
 HRESULT MakeVertexResult(void)
 {
-	// ’¸“_À•W‚Ìİ’è	
+	// é ‚ç‚¹åº§æ¨™ã®è¨­å®š	
 	SetVertexResult();
 
-	// ’¸“_ƒJƒ‰[‚Ìİ’è
+	// é ‚ç‚¹ã‚«ãƒ©ãƒ¼ã®è¨­å®š
 	SetColorResult();
 
-	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 	SetTextureResult();
 
-	// rhw‚Ìİ’è
+	// rhwã®è¨­å®š
 	result.vertexWk[0].rhw =
 		result.vertexWk[1].rhw =
 		result.vertexWk[2].rhw =
@@ -170,7 +170,7 @@ HRESULT MakeVertexResult(void)
 
 
 //=============================================================================
-// ’¸“_À•W‚Ìİ’è
+// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
 //=============================================================================
 void SetVertexResult(void)
 {
@@ -182,7 +182,7 @@ void SetVertexResult(void)
 
 
 //=============================================================================
-// ’¸“_ƒJƒ‰[‚Ìİ’è
+// é ‚ç‚¹ã‚«ãƒ©ãƒ¼ã®è¨­å®š
 //=============================================================================
 void SetColorResult(void)
 {
@@ -194,7 +194,7 @@ void SetColorResult(void)
 
 
 //=============================================================================
-// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 //=============================================================================
 void SetTextureResult(void)
 {
