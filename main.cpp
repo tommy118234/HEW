@@ -412,6 +412,9 @@ void Draw(void)
 	// バックバッファのクリア
 	pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
+	PLAYER *player = GetPlayer(0);
+	ENEMY  *enemy = GetEnemy(0);
+
 	// Direct3Dによる描画の開始
 	if(SUCCEEDED(pD3DDevice->BeginScene()))
 	{
@@ -431,10 +434,18 @@ void Draw(void)
 		case GAME:
 			DrawBg();					// BGの描画
 			DrawRoad();					// 道の描画
-			DrawPlayer();				// プレイヤーの描画
-			DrawBullet();				// バレットの描画
-			DrawEnemy();				// ENEMYの描画
-			
+			if (player->pos.y < enemy->pos.y)
+			{
+				DrawPlayer();				// プレイヤーの描画
+				DrawBullet();				// バレットの描画
+				DrawEnemy();				// ENEMYの描画
+			}
+			else
+			{
+				DrawEnemy();				// ENEMYの描画
+				DrawPlayer();				// プレイヤーの描画
+				DrawBullet();				// バレットの描画				
+			}
 			// UI
 			DrawTimer();				// タイマーの描画
 			DrawScore();				// スコアの描画

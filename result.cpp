@@ -88,7 +88,8 @@ void UninitResult(void)
 //=============================================================================
 void UpdateResult(void)
 {
-	if (IsButtonTriggered(0, BUTTON_A) || GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
+	if (IsButtonTriggered(0, BUTTON_A) || IsButtonTriggered(0, BUTTON_X) || 
+		GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
 	{
 		GetGameData()->isGameClear = FALSE;
 		InitPlayer(REINIT);

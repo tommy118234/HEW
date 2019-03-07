@@ -46,7 +46,7 @@ HRESULT InitPlayer(int type)
 	player->patternAnim = 0;
 	player->direction = 1;
 	player->moving_cooldown = 0;
-	player->speed = 1.0f;
+	player->speed = 3.0f;
 	player->status.ATK = 5;
 	D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X, TEXTURE_PLAYER_SIZE_Y);
 	player->radius = D3DXVec2Length(&temp);
@@ -73,7 +73,7 @@ void UpdatePlayer(void)
 {			
 	PLAYER *player = GetPlayer(0);
 	// アニメーション	
-	player->countAnim+= player->speed*0.3f;
+	player->countAnim+= player->speed*0.1f;
 	if (player->moving_cooldown > 0)
 	{
 		player->patternAnim = (int)(player->countAnim) % ANIM_PATTERN_NUM;
