@@ -47,8 +47,8 @@ HRESULT InitBullet(int type)
 				TEXTURE_GAME_BULLET,					// ファイルの名前
 				&bullet->texture);						// 読み込むメモリのポインタ			
 		}
-		bullet->use = FALSE;									// 未使用（発射されていない弾）
-		bullet->pos = D3DXVECTOR3(-300.0f, 0.0f, 0.0f);			// 座標データを初期化
+		bullet->use = false;									// 未使用（発射されていない弾）
+		bullet->pos = D3DXVECTOR3(-600.0f, -600.0f, 0.0f);			// 座標データを初期化
 		bullet->atk = 0;										// ATKを初期化
 		D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2);
 		bullet->radius = D3DXVec2Length(&temp);
@@ -77,12 +77,12 @@ void UninitBullet(void)
 //=============================================================================
 void UpdateBullet(void)
 {
-	BULLET *bullet = bulletWk;			// バレットのポインターを初期化
+	BULLET *bullet = &bulletWk[0];			// バレットのポインターを初期化
 	PLAYER *player = GetPlayer(0);			// バレットのポインターを初期化
 
 	for (int i = 0; i < BULLET_MAX; i++, bullet++)
 	{		
-		if (bullet->use == true)			// 未使用状態のバレットを見つける
+		if (bullet->use == true)			
 		{
 			// バレットの移動処理
 			//bullet->pos.x += bullet->direction*BULLET_SPEED;

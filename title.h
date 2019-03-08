@@ -24,7 +24,7 @@
 //*****************************************************************************
 // タイトル構造体
 struct GAMETITLE {
-	LPDIRECT3DTEXTURE9				pTexture;		// テクスチャへのポインタ
+	LPDIRECT3DTEXTURE9				pTexture;					// テクスチャへのポインタ
 	VERTEX_2D						vertexWk[NUM_VERTEX];		// 頂点情報格納ワーク
 	D3DXVECTOR3						pos;						// 座標
 	D3DXVECTOR3						rot;						// 回転

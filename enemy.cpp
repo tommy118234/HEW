@@ -9,14 +9,16 @@
 #include "bullet.h"
 #include "debugproc.h"
 #include "math.h"
+
+#include "time.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT	 MakeVertexEnemy(void);
-void	 SetVertexEnemy(void);
+HRESULT	 MakeVertexEnemy(int no);
+void	 SetVertexEnemy(int no);
 void	 SetTextureEnemy(int no, int cntPattern);
 void	 SetEnemy(void);
 //*****************************************************************************
@@ -24,11 +26,13 @@ void	 SetEnemy(void);
 //*****************************************************************************
 ENEMY	 enemy[ENEMY_MAX];
 LPDIRECT3DTEXTURE9 enemyTexture[2];//二つのENEMY
+int		 enemy_count,enemy_rate;
 //=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT InitEnemy(int type)
 {
+	srand(time(NULL));
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	ENEMY *enemy = GetEnemy(0);	// プレイヤー０番のアドレスを取得する	
 	// テクスチャーの初期化を行う？
@@ -49,10 +53,9 @@ HRESULT InitEnemy(int type)
 		enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
 								 SCREEN_CENTER_Y/4 + rand() % SCREEN_CENTER_Y,
 								 0.0f);
-		enemy->use = false;
+		enemy->use = FALSE;
 		enemy->countAnim = 0;
 		enemy->patternAnim = 0;
-		enemy->direction = 1;
 		enemy->moving_cooldown = 0;
 		enemy->speed = 1.0f;
 		enemy->status.ATK = 5;
@@ -61,8 +64,10 @@ HRESULT InitEnemy(int type)
 		enemy->baseAngle = atan2f(TEXTURE_ENEMY_SIZE_Y, TEXTURE_ENEMY_SIZE_X);	// プレイヤーの角度を初期化
 		enemy->type = rand()%2;
 		// 頂点情報の作成
-		MakeVertexEnemy();
+		MakeVertexEnemy(i);
 	}
+	enemy_count = 0;
+	enemy_rate = 100;
 	return S_OK;
 }
 
@@ -86,26 +91,25 @@ void UpdateEnemy(void)
 	{
 		if (enemy->use)
 		{
-			enemy->countAnim+=enemy->speed*0.3f;
-
-			enemy->moving_cooldown = 1;
-			//enemy->countAnim ++;
-			if (enemy->moving_cooldown > 0)
-			{
+			enemy->countAnim += enemy->speed * 0.3f;
+			//enemy->moving_cooldown = 1;
+			////enemy->countAnim ++;
+			//if (enemy->moving_cooldown > 0)
+			//{
 				enemy->patternAnim = (int)(enemy->countAnim) % ANIM_PATTERN_NUM;
 				// テクスチャ座標を設定
-				SetTextureEnemy(enemy->direction, enemy->patternAnim);
-				//if (enemy->patternAnim == 1 || enemy->patternAnim == 6)
-				//	enemy->moving_cooldown--;
-			}
-			enemy->pos.x-=5;
-			if (enemy->pos.x < 0)
-				enemy->use = false;
+				SetTextureEnemy(i, enemy->patternAnim);			
+			//}
+			enemy->pos.x += enemy->direction*enemy->speed * 3.0f;
 			//// 移動後の座標で頂点を設定
-			SetVertexEnemy();
+			SetVertexEnemy(i);
+			if (enemy->pos.x < 0 || enemy->pos.x > SCREEN_WIDTH)
+				enemy->use = false;
 		}
 		else
 		{
+			enemy_count++;
+			if (enemy_count>enemy_rate&& !enemy->use)			
 			SetEnemy();
 		}
 	}
@@ -114,12 +118,12 @@ void UpdateEnemy(void)
 //=============================================================================
 // 描画処理
 //=============================================================================
-void DrawEnemy(void)
+void DrawEnemy(int pno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	ENEMY *enemy = GetEnemy(0);
-	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
-	{
+	ENEMY *enemy = GetEnemy(pno);
+	//for (int i = 0; i < ENEMY_MAX; i++, enemy++)
+	//{
 		if (enemy->use)					// 使用している状態なら更新する
 		{
 			// テクスチャの設定
@@ -127,18 +131,18 @@ void DrawEnemy(void)
 			// ポリゴンの描画
 			pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_BULLET, enemy->vtx, sizeof(VERTEX_2D));
 		}
-	}
+	//}
 }
 
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT MakeVertexEnemy(void)
+HRESULT MakeVertexEnemy(int no)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	ENEMY *enemy = GetEnemy(0);
+	ENEMY *enemy = GetEnemy(no);
 	// 頂点座標の設定
-	SetVertexEnemy();
+	SetVertexEnemy(no);
 	// rhwの設定
 	enemy->vtx[0].rhw =
 	enemy->vtx[1].rhw =
@@ -155,16 +159,16 @@ HRESULT MakeVertexEnemy(void)
 	enemy->vtx[2].tex = D3DXVECTOR2(0.0f, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
 	enemy->vtx[3].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
 	// テクスチャの設定
-	SetTextureEnemy(enemy->direction, enemy->patternAnim);
+	SetTextureEnemy(no, enemy->patternAnim);
 	return S_OK;
 }
 
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void SetVertexEnemy(void)
+void SetVertexEnemy(int no)
 {
-	ENEMY *enemy = GetEnemy(0);
+	ENEMY *enemy = GetEnemy(no);
 	// 頂点座標の設定
 	enemy->vtx[0].vtx = D3DXVECTOR3(enemy->pos.x, enemy->pos.y, 0);
 	enemy->vtx[1].vtx = D3DXVECTOR3(enemy->pos.x + TEXTURE_ENEMY_SIZE_X, enemy->pos.y, 0);
@@ -174,21 +178,33 @@ void SetVertexEnemy(void)
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void SetTextureEnemy(int dir, int cntPattern)
+void SetTextureEnemy(int no, int cntPattern)
 {
-	ENEMY *enemy = GetEnemy(0);
+	ENEMY *enemy = GetEnemy(no);
 	// テクスチャ座標の設定
 	int x = cntPattern % TEXTURE_PATTERN_DIVIDE_X;
 	int y = cntPattern / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeX = 1.0f / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeY = 1.0f / TEXTURE_PATTERN_DIVIDE_Y;
 		
-	enemy->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
-	enemy->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
-	enemy->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
-	enemy->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);	
+	if (enemy->direction < 0)
+	{
+		enemy->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		enemy->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		enemy->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		enemy->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	}
+	else
+	{
+		enemy->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
+		enemy->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
+		enemy->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
+		enemy->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	}
 }
-
+//=============================================================================
+// 敵の発射設定
+//=============================================================================
 void SetEnemy(void)
 {
 	ENEMY *enemy = GetEnemy(0);			  
@@ -201,7 +217,11 @@ void SetEnemy(void)
 									 SCREEN_CENTER_Y/4 + rand() % SCREEN_CENTER_Y,
 									 0.0f);	// 座標をセット
 			enemy->patternAnim = 0;
+			enemy->speed = 1.0f;
+			enemy->direction = -1;
 			enemy->type = rand() % 2;
+			enemy_count = 0;
+			enemy_rate = 60+rand()%41;
 			return;							// 1発セットしたので終了する
 		}
 	}
