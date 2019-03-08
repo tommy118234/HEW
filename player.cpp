@@ -226,7 +226,7 @@ void SetTexturePlayer(int dir, int cntPattern )
 	float sizeX = 1.0f / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeY = 1.0f / TEXTURE_PATTERN_DIVIDE_Y;
 	
-	if (dir == 1)
+	if (dir == -1)
 	{
 		player->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
 		player->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);

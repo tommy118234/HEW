@@ -24,6 +24,7 @@
 #include "title.h"
 #include "result.h"
 #include "score.h"
+#include "life.h"
 
 
 //*****************************************************************************
@@ -472,6 +473,7 @@ void Draw(void)
 				i++;
 				enemy++;
 			}
+			//DrawBullet();
 			// UI
 			DrawTimer();				// タイマーの描画
 			DrawScore();				// スコアの描画
