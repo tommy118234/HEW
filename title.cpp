@@ -7,6 +7,7 @@
 #include "main.h"
 #include "input.h"
 #include "sound.h"
+#include "quadrangle.h"
 #include "player.h"
 #include "title.h"
 
@@ -16,6 +17,9 @@
 //*****************************************************************************
 // テクスチャ場所
 #define TEXTURE_TITLE			_T("data/TEXTURE/title.png")
+#define TEXTURE_MENU_START		_T("data/TEXTURE/start.png")
+#define TEXTURE_MENU_EXIT		_T("data/TEXTURE/exit.png")
+#define TEXTURE_CURSOR			_T("data/TEXTURE/cursor.png")
 
 // タイトルのサイズ
 #define TITLE_SIZE_X			(SCREEN_WIDTH)
@@ -24,6 +28,27 @@
 // タイトルの座標
 #define INIT_POS_X				(0.0f)
 #define MOVE_SPEED_X			(1.0f)
+
+// ���j���\�̎��
+enum MENU_TYPE
+{
+	MENU_START,					// �Q�[���X�^�[�g
+	MENU_EXIT,					// �Q�[���I��
+	MENU_TYPE_MAX				// ���j���[�̐�
+};
+
+// ���j���[
+#define MENU_SIZE_X				(250.0f)
+#define MENU_SIZE_Y				(150.0f)
+#define START_POS_X				(200.0f)
+#define EXIT_POS_X				(500.0f)
+#define MENU_POS_Y				(450.0f)
+
+// �J�[�\��
+#define CURSOR_SIZE_X			(45.0f)
+#define CURSOR_SIZE_Y			(80.0f)
+#define CURSOR_POS_X			(500.0f)
+#define CURSOR_POS_Y			(530.0f)
 
 
 //*****************************************************************************
@@ -35,10 +60,18 @@ void SetColorTitle(void);					// 頂点カラーの設定
 void SetTextureTitle(void);					// テクスチャ座標の設定
 
 
+
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
 GAMETITLE title;
+int	selectNo;	
+
+// @QUADRANGLE�\���̂Ŏ蔲�����
+QUADRANGLE menu[MENU_TYPE_MAX];					// ���j���[
+LPDIRECT3DTEXTURE9 menuTex[MENU_TYPE_MAX];		// ���j���\�e�N�X�`��
+QUADRANGLE cursor;								// �J�[�\��
+LPDIRECT3DTEXTURE9 cursorTex;					// �J�[�\���e�N�X�`��
 
 
 //=============================================================================
@@ -54,11 +87,42 @@ HRESULT InitTitle(int type)
 		D3DXCreateTextureFromFile(pDevice,
 			TEXTURE_TITLE,
 			&title.pTexture);
+
+		// �e�N�X�`���̓ǂݍ���
+		D3DXCreateTextureFromFile(pDevice,
+			TEXTURE_MENU_START,
+			&menuTex[MENU_START]);
+
+		// �e�N�X�`���̓ǂݍ���
+		D3DXCreateTextureFromFile(pDevice,
+			TEXTURE_MENU_EXIT,
+			&menuTex[MENU_EXIT]);
+
+		// �e�N�X�`���̓ǂݍ���
+		D3DXCreateTextureFromFile(pDevice,
+			TEXTURE_CURSOR,
+			&cursorTex);
 	}
 
+	// BG����
 	title.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	title.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	MakeVertexTitle();
+
+	// ���j���[
+	InitQuad(&menu[MENU_START], MENU_SIZE_X, MENU_SIZE_Y);
+	InitQuad(&menu[MENU_EXIT], MENU_SIZE_X, MENU_SIZE_Y);
+	menu[MENU_START].transform.pos = D3DXVECTOR3(START_POS_X, MENU_POS_Y, 0.0f);
+	menu[MENU_EXIT].transform.pos = D3DXVECTOR3(EXIT_POS_X, MENU_POS_Y, 0.0f);
+	SetVertexQuad(&menu[MENU_START]);
+	SetVertexQuad(&menu[MENU_EXIT]);
+
+	// �J�[�\��
+	InitQuad(&cursor, CURSOR_SIZE_X, CURSOR_SIZE_Y);
+	cursor.transform.pos = D3DXVECTOR3(CURSOR_POS_X, CURSOR_POS_Y, 0.0f);
+	SetVertexQuad(&cursor);
+
+	selectNo = MENU_START;
 
 	return S_OK;
 }
@@ -80,12 +144,38 @@ void UpdateTitle(void)
 {
 	// BGM再生
 	PlayGameSound(BGM_TITLE, CONTINUE_SOUND, LOOP);
+	// �I��
+	if (IsButtonTriggered(0, BUTTON_RIGHT) || GetKeyboardTrigger(DIK_RIGHT)
+		|| IsButtonTriggered(0, BUTTON_LEFT) || GetKeyboardTrigger(DIK_LEFT))
+	{
+		selectNo = selectNo ? MENU_START : MENU_EXIT;
+		PlayGameSound(SE_MENU_CURSOR, INIT_SOUND, NONE);	// �J�[�\����
+	}
+
+	// ����
 	if (IsButtonTriggered(0, BUTTON_A) || IsButtonTriggered(0, BUTTON_X)
 		|| GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
 	{
-		StopAllSound(INIT_SOUND);	// 音を全て止める
-		SetStage(GAME);				// ステージ遷移
+		StopAllSound(INIT_SOUND);							// ����S�Ď~�߂�
+		PlayGameSound(SE_MENU_DECISION, INIT_SOUND, NONE);	// ���艹
+		if (selectNo == MENU_START) SetStage(GAME);			// �Q�[���ɑJ��
+		if (selectNo == MENU_EXIT)	SetStage(EXIT);			// �Q�[���I��
 	}
+
+	// �J�[�\���̏ꏊ
+	selectNo ? cursor.transform.pos.x = EXIT_POS_X : cursor.transform.pos.x = START_POS_X;
+	SetVertexQuad(&cursor);
+
+	// ���j���[
+	for (int i = 0; i < MENU_TYPE_MAX; i++)
+	{
+		menu[i].radius = menu[i].originalRadius;
+
+
+	}
+	menu[selectNo].radius = menu[selectNo].radius * 1.2f;
+	SetVertexQuad(&menu[MENU_START]);
+	SetVertexQuad(&menu[MENU_EXIT]);
 }
 
 
@@ -99,11 +189,23 @@ void DrawTitle(void)
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
+
 	// テクスチャの設定
 	pDevice->SetTexture(0, title.pTexture);
 
 	// ポリゴンの描画
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, title.vertexWk, sizeof(VERTEX_2D));
+
+	// ���j���[
+	for (int i = 0; i < MENU_TYPE_MAX; i++)
+	{
+		pDevice->SetTexture(0, menuTex[i]);
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, menu[i].vertexWk, sizeof(VERTEX_2D));
+	}
+
+	// �J�[�\��
+	pDevice->SetTexture(0, cursorTex);
+	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, cursor.vertexWk, sizeof(VERTEX_2D));
 }
 
 

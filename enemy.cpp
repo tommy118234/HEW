@@ -102,6 +102,7 @@ void UpdateEnemy(void)
 			//}
 			enemy->pos.x += enemy->direction*enemy->speed * 3.0f;
 			//// 移動後の座標で頂点を設定
+
 			SetVertexEnemy(i);
 			if (enemy->pos.x < 0 || enemy->pos.x > SCREEN_WIDTH)
 				enemy->use = false;
@@ -141,9 +142,11 @@ HRESULT MakeVertexEnemy(int no)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	ENEMY *enemy = GetEnemy(no);
+
 	// 頂点座標の設定
 	SetVertexEnemy(no);
 	// rhwの設定
+
 	enemy->vtx[0].rhw =
 	enemy->vtx[1].rhw =
 	enemy->vtx[2].rhw =
@@ -158,7 +161,9 @@ HRESULT MakeVertexEnemy(int no)
 	enemy->vtx[1].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 0.0f);
 	enemy->vtx[2].tex = D3DXVECTOR2(0.0f, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
 	enemy->vtx[3].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
+
 	// テクスチャの設定
+
 	SetTextureEnemy(no, enemy->patternAnim);
 	return S_OK;
 }
@@ -181,7 +186,9 @@ void SetVertexEnemy(int no)
 void SetTextureEnemy(int no, int cntPattern)
 {
 	ENEMY *enemy = GetEnemy(no);
+
 	// テクスチャ座標の設定
+
 	int x = cntPattern % TEXTURE_PATTERN_DIVIDE_X;
 	int y = cntPattern / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeX = 1.0f / TEXTURE_PATTERN_DIVIDE_X;

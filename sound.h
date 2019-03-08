@@ -29,6 +29,8 @@ enum SOUND_NAME	//サウンドテーブル --------------------------------------------
 	SE_DAMAGE_PLAYER,
 	SE_DAMAGE_TARGET,
 	SE_WALK,
+	SE_MENU_DECISION,
+	SE_MENU_CURSOR,
 
 	// BGM
 	BGM_TITLE,

@@ -24,7 +24,6 @@
 #include "title.h"
 #include "result.h"
 #include "score.h"
-#include "life.h"
 
 
 //*****************************************************************************
@@ -55,7 +54,7 @@ GAMEDATA			gameData;				// ゲーム進行データセット
 #ifdef _DEBUG
 int					cntFPS;					// FPSカウンタ
 #endif
-
+int					player_cnt;
 
 //=============================================================================
 // メイン関数
@@ -277,6 +276,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		}
 	}
 
+
 	// レンダーステートパラメータの設定
     pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);				// 裏面をカリング
 	pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);				// αブレンドを行う
@@ -309,7 +309,6 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitSplash(0);				// スプラッシュの初期化
 	InitTitle(0);				// タイトルの初期化
 	InitResult(0);				// リザルトの初期化
-
 #ifdef _DEBUG
 	InitDebugProc();			// デバッグ表示の初期化
 #endif
@@ -335,6 +334,7 @@ void Uninit(void)
 #ifdef _DEBUG
 	UninitDebugProc();			// デバッグ表示の終了
 #endif
+
 
 	//UninitTitle();			// タイトルの終了処理
 	UninitInput();				// 入力処理の終了処理
@@ -380,6 +380,7 @@ void Update(void)
 		break;
 
 	case GAME:
+
 		PlayGameSound(BGM_GAME, CONTINUE_SOUND, LOOP);
 		//PlayGameSound(BGM_MUTEKI, CONTINUE_SOUND, LOOP);
 		UpdatePlayer();				// プレイヤーの更新
@@ -390,6 +391,7 @@ void Update(void)
 		UpdateTimer();				// タイマーの更新
 		UpdateScore();				// スコアの更新
 		UpdateLife();				// ライフの更新
+
 		CheckHit();
 		break;
 
@@ -423,9 +425,7 @@ void Draw(void)
 	ENEMY  *enemy = GetEnemy(0);
 	BULLET  *bullet = GetBullet(0);
 	int i;
-
 	D3DXVECTOR3 player_center, enemy_center;
-
 	// Direct3Dによる描画の開始
 	if(SUCCEEDED(pD3DDevice->BeginScene()))
 	{
@@ -445,7 +445,6 @@ void Draw(void)
 		case GAME:
 			DrawBg();					// BGの描画
 			DrawRoad();					// 道の描画
-
 			player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
 			PrintDebugProc(1, "P : %f\n", player_center.y);
 			for (i = 0; i < ENEMY_MAX; i++,enemy++)
@@ -500,6 +499,7 @@ void Draw(void)
 
 	// バックバッファとフロントバッファの入れ替え
 	pD3DDevice->Present(NULL, NULL, NULL, NULL);
+	PrintDebugProc(1, "%f %f \n %f %f \n", player_center.x, player_center.y, enemy_center.x, enemy_center.y);
 }
 
 
@@ -556,10 +556,8 @@ GAMEDATA *GetGameData(void)
 //=============================================================================
 bool CheckHitBB(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, D3DXVECTOR2 size1, D3DXVECTOR2 size2)
 {	
-
 	size1 /= 2.0f;	// 半サイズにする
 	size2 /= 2.0f;	// 同上
-
 	if (pos1.x + size1.x > pos2.x - size2.x && pos2.x + size2.x > pos1.x - size1.x &&
 		pos1.y + size1.y > pos2.y - size2.y && pos2.y + size2.y > pos1.y - size1.y)
 	{
@@ -612,6 +610,7 @@ void CheckHit(void)
 		}
 	}
 
+
 	// ボスと弾(BC) // bullet(heavy) inner loop, enemy(light) outer loop
 	enemy = GetEnemy(0);					// エネミーのポインターを初期化
 	for (int j = 0; j < ENEMY_MAX; j++, enemy++)
@@ -624,7 +623,7 @@ void CheckHit(void)
 			bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2, 0);
 			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size) && bullet->use)
 			{
-				//bullet->use = false;		// 弾の消滅処理を行い
+        //bullet->use = false;		// 弾の消滅処理を行い
 				//敵HP減少アニメ
 				if (enemy->type == 1)
 					enemy->use = false;

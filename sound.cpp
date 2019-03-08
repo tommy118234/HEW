@@ -33,6 +33,9 @@ const TCHAR* c_soundFilename[] = {
 	_T("data/SOUND/SE/PlayerDamage.wav"),
 	_T("data/SOUND/SE/TargetDamage.wav"),
 	_T("data/SOUND/SE/walk.wav"),
+	_T("data/SOUND/SE/se_menu_decision.wav"),
+	_T("data/SOUND/SE/se_menu_cursor.wav"),
+
 
 	// BGM
 	_T("data/SOUND/BGM/title.wav"),

@@ -117,16 +117,16 @@ struct  VERTEX_2D
 // TRANSFORM構造体を定義
 struct  TRANSFORM
 {
-	D3DXVECTOR3		pos;			// 位置
-	D3DXVECTOR3		rot;			// 回転
-	D3DXVECTOR3		scl;			// 大きさ
+	D3DXVECTOR3		pos;		// 位置
+	D3DXVECTOR3		rot;		// 回転
+	D3DXVECTOR3		scl;		// 大きさ
 };
 
 
 // ゲーム進行データセット
 struct GAMEDATA
 {
-	BOOL			isGameClear;	// ゲームのリザルト　TRUE:GameClear FALSE:GameOver
+	BOOL			isGameClear;	// ゲームのリザルト// TRUE:GameClear FALSE:GameOver
 };
 
 
@@ -141,6 +141,8 @@ struct CHARACTER
 	int EXP;
 	int LV;
 };
+
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
