@@ -1,13 +1,13 @@
 //=============================================================================
-// ƒXƒvƒ‰ƒbƒVƒ… [splash.cpp]
+// ã‚¹ãƒ—ãƒ©ãƒƒã‚·ãƒ¥ [splash.cpp]
 //
-// Author : HAL“Œ‹’‹ŠÔ•” 2”N§ƒQ[ƒ€Šw‰È GP11B341 24 ’†˜a‹P
-// ì¬“ú : 2018/1/16
+// Author : HALæ±äº¬æ˜¼é–“éƒ¨ 2å¹´åˆ¶ã‚²ãƒ¼ãƒ å­¦ç§‘ GP11B341 24 ä¸­è¾¼å’Œè¼
+// ä½œæˆæ—¥ : 2018/1/16
 //=============================================================================
 
 
 //*****************************************************************************
-// ƒCƒ“ƒNƒ‹[ƒh
+// ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰
 //*****************************************************************************
 #include "sound.h"
 #include "input.h"
@@ -16,63 +16,63 @@
 
 
 //*****************************************************************************
-// ƒ}ƒNƒ’è‹`
+// ãƒã‚¯ãƒ­å®šç¾©
 //*****************************************************************************
-// ƒeƒNƒXƒ`ƒƒ
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£
 #define TEXTURE_TEAM_LOGO			("data/TEXTURE/logo.png")
 
-// ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒY
-#define TEAM_LOGO_SIZE_X			(480)						// ƒTƒCƒYiXj
-#define TEAM_LOGO_SIZE_Y			(200)						// ƒTƒCƒYiYj
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚º
+#define TEAM_LOGO_SIZE_X			(480)						// ã‚µã‚¤ã‚ºï¼ˆXï¼‰
+#define TEAM_LOGO_SIZE_Y			(200)						// ã‚µã‚¤ã‚ºï¼ˆYï¼‰
 
-// ƒ^ƒCƒ€ƒe[ƒuƒ‹i1/1000•bj
-#define 	SEQUENCE_1				(0			+ 1000)			// ƒEƒFƒCƒg
-#define		SEQUENCE_2				(SEQUENCE_1	+ 1000)			// ƒtƒF[ƒhƒCƒ“
-#define		SEQUENCE_3				(SEQUENCE_2	+ 2000)			// •\¦’†
-#define		WAIT_PRE_TITLE			(SEQUENCE_3	+ 1000)			// ƒtƒF[ƒhƒAƒEƒg
-#define		END						(WAIT_PRE_TITLE + 500)		// ƒEƒFƒCƒg	
-
-
-//*****************************************************************************
-// ƒvƒƒgƒ^ƒCƒvéŒ¾
-//*****************************************************************************
+// ã‚¿ã‚¤ãƒ ãƒ†ãƒ¼ãƒ–ãƒ«ï¼ˆ1/1000ç§’ï¼‰
+#define 	SEQUENCE_1				(0			+ 1000)			// ã‚¦ã‚§ã‚¤ãƒˆ
+#define		SEQUENCE_2				(SEQUENCE_1	+ 1000)			// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
+#define		SEQUENCE_3				(SEQUENCE_2	+ 2000)			// è¡¨ç¤ºä¸­
+#define		WAIT_PRE_TITLE			(SEQUENCE_3	+ 1000)			// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
+#define		END						(WAIT_PRE_TITLE + 500)		// ã‚¦ã‚§ã‚¤ãƒˆ	
 
 
 //*****************************************************************************
-// ƒOƒ[ƒoƒ‹•Ï”
+// ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 //*****************************************************************************
-QUADRANGLE			splash;										// ƒ`[ƒ€ƒƒS
-QUADRANGLE			bg;											// ”wŒi
-LPDIRECT3DTEXTURE9	texSplash = NULL;							// ƒeƒNƒXƒ`ƒƒ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+
+
+//*****************************************************************************
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
+//*****************************************************************************
+QUADRANGLE			splash;										// ãƒãƒ¼ãƒ ãƒ­ã‚´
+QUADRANGLE			bg;											// èƒŒæ™¯
+LPDIRECT3DTEXTURE9	texSplash = NULL;							// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 
 
 //=============================================================================
-// ‰Šú‰»ˆ—
+// åˆæœŸåŒ–å‡¦ç†
 //=============================================================================
 HRESULT InitSplash(BOOL type)
 {
 	LPDIRECT3DDEVICE9 device = GetDevice();
 
-	// ƒƒS
+	// ãƒ­ã‚´
 	InitQuad(&splash, TEAM_LOGO_SIZE_X, TEAM_LOGO_SIZE_Y);
 	splash.transform.pos = D3DXVECTOR3((float)SCREEN_CENTER_X, (float)SCREEN_CENTER_Y, 0.0f);
 	SetColorQuad(&bg, D3DCOLOR_RGBA(255, 255, 255, 0));
 	SetVertexQuad(&splash);
 
-	// ”wŒi
+	// èƒŒæ™¯
 	InitQuad(&bg, SCREEN_WIDTH, SCREEN_HEIGHT);
 	bg.transform.pos = D3DXVECTOR3((float)SCREEN_CENTER_X, (float)SCREEN_CENTER_Y, 0.0f);
 	SetColorQuad(&bg, D3DCOLOR_RGBA(255, 255, 255, 255));
 	SetVertexQuad(&bg);
 
-	// 1‰ñ–Ú‚Ì‰Šú‰»‚Ì‚İÀs
+	// 1å›ç›®ã®åˆæœŸåŒ–æ™‚ã®ã¿å®Ÿè¡Œ
 	if (type != REINIT)
-	{// ƒV[ƒ“‘JˆÚ‚È‚Ç‚É‚æ‚éÄ‰Šú‰»‚Ís‚í‚È‚¢ˆ—‚ğ«‚É‘‚­
+	{// ã‚·ãƒ¼ãƒ³é·ç§»ãªã©ã«ã‚ˆã‚‹å†åˆæœŸåŒ–æ™‚ã¯è¡Œã‚ãªã„å‡¦ç†ã‚’â†“ã«æ›¸ã
 
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
-		D3DXCreateTextureFromFile(device,		// ƒfƒoƒCƒX‚Ìƒ|ƒCƒ“ƒ^
-			TEXTURE_TEAM_LOGO,					// ƒtƒ@ƒCƒ‹‚Ì–¼‘O
-			&texSplash);						// “Ç‚İ‚Şƒƒ‚ƒŠ‚Ìƒ|ƒCƒ“ƒ^
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­ã¿è¾¼ã¿
+		D3DXCreateTextureFromFile(device,		// ãƒ‡ãƒã‚¤ã‚¹ã®ãƒã‚¤ãƒ³ã‚¿
+			TEXTURE_TEAM_LOGO,					// ãƒ•ã‚¡ã‚¤ãƒ«ã®åå‰
+			&texSplash);						// èª­ã¿è¾¼ã‚€ãƒ¡ãƒ¢ãƒªã®ãƒã‚¤ãƒ³ã‚¿
 	}
 
 	return S_OK;
@@ -80,7 +80,7 @@ HRESULT InitSplash(BOOL type)
 
 
 //=============================================================================
-// I—¹ˆ—
+// çµ‚äº†å‡¦ç†
 //=============================================================================
 void UninitSplash(void)
 {
@@ -89,21 +89,21 @@ void UninitSplash(void)
 
 
 //=============================================================================
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 //=============================================================================
 void UpdateSplash(void)
 {
-	// @‰º€”õ
-	DWORD currentTime = GetTime();			// Œ»İ‚ğæ“¾‚·‚é
-	static	DWORD lastTime = currentTime;	// ŠÔŒv‘ª—p
-	static	DWORD time = 0;					// ŠÔŒv‘ª—p
+	// @ä¸‹æº–å‚™
+	DWORD currentTime = GetTime();			// ç¾åœ¨æ™‚åˆ»ã‚’å–å¾—ã™ã‚‹
+	static	DWORD lastTime = currentTime;	// æ™‚é–“è¨ˆæ¸¬ç”¨
+	static	DWORD time = 0;					// æ™‚é–“è¨ˆæ¸¬ç”¨
 	static  int valueFade = 0;
 
-	// @ŠÔŒv‘ª
-	time += currentTime - lastTime;			// Œo‰ßŠÔiƒ~ƒŠ•bj‚ğ‹L˜^
-	lastTime = currentTime;					// Œ»ƒtƒŒ[ƒ€‚Å‚Ì‚ğ‹L˜^
+	// @æ™‚é–“è¨ˆæ¸¬
+	time += currentTime - lastTime;			// çµŒéæ™‚é–“ï¼ˆãƒŸãƒªç§’ï¼‰ã‚’è¨˜éŒ²
+	lastTime = currentTime;					// ç¾ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã®æ™‚åˆ»ã‚’è¨˜éŒ²
 
-	// @ƒXƒLƒbƒv
+	// @ã‚¹ã‚­ãƒƒãƒ—
 	if (GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE)
 		|| IsButtonTriggered(0, BUTTON_A) || IsButtonTriggered(0, BUTTON_X) || IsButtonTriggered(0, BUTTON_B)
 		|| IsButtonTriggered(1, BUTTON_A) || IsButtonTriggered(1, BUTTON_X) || IsButtonTriggered(1, BUTTON_B))
@@ -111,63 +111,63 @@ void UpdateSplash(void)
 		time = END;
 	}
 
-	// @ƒXƒvƒ‰ƒbƒVƒ…
+	// @ã‚¹ãƒ—ãƒ©ãƒƒã‚·ãƒ¥
 	if (0 < time && time < SEQUENCE_1)
-	{// •\¦‚Ü‚Å‚ÌƒEƒFƒCƒg
+	{// è¡¨ç¤ºã¾ã§ã®ã‚¦ã‚§ã‚¤ãƒˆ
 
 	}
 	if (SEQUENCE_1 < time && time < SEQUENCE_2)
-	{// ƒtƒF[ƒhƒCƒ“
+	{// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
 		valueFade += 255 / (int)MSECOND(SEQUENCE_2 - SEQUENCE_1);
 		if (valueFade > 255) { valueFade = 255; }
 	}
 	if (SEQUENCE_2 < time && time < SEQUENCE_3)
-	{// •\¦’†
+	{// è¡¨ç¤ºä¸­
 		valueFade = 255;
 	}
 	if (SEQUENCE_3 < time && time < WAIT_PRE_TITLE)
-	{// ƒtƒF[ƒhƒAƒEƒg
+	{// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
 		valueFade -= 255 / (int)MSECOND(WAIT_PRE_TITLE - SEQUENCE_3);
 		if (valueFade < 0) { valueFade = 0; }
 	}
 	if (WAIT_PRE_TITLE < time && time < END)
-	{// ƒEƒFƒCƒg
+	{// ã‚¦ã‚§ã‚¤ãƒˆ
 		valueFade = 0;
 	}
 	if (END < time)
-	{// I—¹ˆ—
+	{// çµ‚äº†å‡¦ç†
 		time = 0;
 		valueFade = 0;
 		SetStage(TITLE);
 	}
 
-	// ƒ¿’l‚Ì”½‰f
+	// Î±å€¤ã®åæ˜ 
 	SetColorQuad(&splash, D3DCOLOR_RGBA(255, 255, 255, valueFade));
 }
 
 
 //=============================================================================
-// •`‰æˆ—
+// æç”»å‡¦ç†
 //=============================================================================
 void DrawSplash(void)
 {
 	LPDIRECT3DDEVICE9 device = GetDevice();
 
-	// ’¸“_ƒtƒH[ƒ}ƒbƒg‚Ìİ’è
+	// é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®è¨­å®š
 	device->SetFVF(FVF_VERTEX_2D);
 
-	// @”wŒi
-	// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+	// @èƒŒæ™¯
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®š
 	device->SetTexture(0, NULL);
 
-	// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+	// ãƒãƒªã‚´ãƒ³ã®æç”»
 	device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, bg.vertexWk, sizeof(VERTEX_2D));
 	
-	// @ƒƒS
-	// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+	// @ãƒ­ã‚´
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®š
 	device->SetTexture(0, texSplash);
 
-	// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+	// ãƒãƒªã‚´ãƒ³ã®æç”»
 	device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, splash.vertexWk, sizeof(VERTEX_2D));
 }
 

@@ -1,7 +1,7 @@
 //=============================================================================
 //
-// ƒvƒŒ[ƒ„[ˆ— [player.cpp]
-// Author : ™@ƒƒC‰„
+// ãƒ—ãƒ¬ãƒ¼ãƒ¤ãƒ¼å‡¦ç† [player.cpp]
+// Author : å¾ã€€ãƒ¯ã‚¤å»¶
 //
 //=============================================================================
 #include "player.h"
@@ -9,38 +9,38 @@
 #include "bullet.h"
 #include "debugproc.h"
 //*****************************************************************************
-// ƒ}ƒNƒ’è‹`
+// ãƒã‚¯ãƒ­å®šç¾©
 //*****************************************************************************
 //*****************************************************************************
-// ƒvƒƒgƒ^ƒCƒvéŒ¾
+// ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 //*****************************************************************************
 HRESULT	 MakeVertexPlayer(void);
 void	 SetVertexPlayer(void);
 void	 SetTexturePlayer(int dir,int cntPattern);
 //*****************************************************************************
-// ƒOƒ[ƒoƒ‹•Ï”
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
 //*****************************************************************************
 PLAYER	 player[PLAYER_MAX];
 //=============================================================================
-// ‰Šú‰»ˆ—
+// åˆæœŸåŒ–å‡¦ç†
 //=============================================================================
 HRESULT InitPlayer(int type)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	PLAYER *player = GetPlayer(0);	// ƒvƒŒƒCƒ„[‚O”Ô‚ÌƒAƒhƒŒƒX‚ğæ“¾‚·‚é	
-	// ƒeƒNƒXƒ`ƒƒ[‚Ì‰Šú‰»‚ğs‚¤H
+	PLAYER *player = GetPlayer(0);	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ï¼ç•ªã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹	
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¼ã®åˆæœŸåŒ–ã‚’è¡Œã†ï¼Ÿ
 	if (type == 0)
 	{
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
-		D3DXCreateTextureFromFile(pDevice,				// ƒfƒoƒCƒX‚Ìƒ|ƒCƒ“ƒ^
-								  TEXTURE_GAME_PLAYER,	// ƒtƒ@ƒCƒ‹‚Ì–¼‘O
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­ã¿è¾¼ã¿
+		D3DXCreateTextureFromFile(pDevice,				// ãƒ‡ãƒã‚¤ã‚¹ã®ãƒã‚¤ãƒ³ã‚¿
+								  TEXTURE_GAME_PLAYER,	// ãƒ•ã‚¡ã‚¤ãƒ«ã®åå‰
 								  &player->texture[0]);
 
-		D3DXCreateTextureFromFile(pDevice,				// ƒfƒoƒCƒX‚Ìƒ|ƒCƒ“ƒ^
-								  TEXTURE_GAME_PLAYER2,	// ƒtƒ@ƒCƒ‹‚Ì–¼‘O
+		D3DXCreateTextureFromFile(pDevice,				// ãƒ‡ãƒã‚¤ã‚¹ã®ãƒã‚¤ãƒ³ã‚¿
+								  TEXTURE_GAME_PLAYER2,	// ãƒ•ã‚¡ã‚¤ãƒ«ã®åå‰
 								  &player->texture[1]);
 	}
-	// ƒvƒŒƒCƒ„[‚Ì‰Šú‰»ˆ—	   
+	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åˆæœŸåŒ–å‡¦ç†	   
 	player->pos = D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y, 0.0f);
 	player->countAnim = 0;
 	player->patternAnim = 0;
@@ -50,14 +50,14 @@ HRESULT InitPlayer(int type)
 	player->status.ATK = 5;
 	D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X, TEXTURE_PLAYER_SIZE_Y);
 	player->radius = D3DXVec2Length(&temp);
-	player->baseAngle = atan2f(TEXTURE_PLAYER_SIZE_Y, TEXTURE_PLAYER_SIZE_X);	// ƒvƒŒƒCƒ„[‚ÌŠp“x‚ğ‰Šú‰»
-	// ’¸“_î•ñ‚Ìì¬
+	player->baseAngle = atan2f(TEXTURE_PLAYER_SIZE_Y, TEXTURE_PLAYER_SIZE_X);	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®è§’åº¦ã‚’åˆæœŸåŒ–
+	// é ‚ç‚¹æƒ…å ±ã®ä½œæˆ
 	MakeVertexPlayer();
 	return S_OK;
 }
 
 //=============================================================================
-// I—¹ˆ—
+// çµ‚äº†å‡¦ç†
 //=============================================================================
 void UninitPlayer(void)
 {
@@ -67,7 +67,7 @@ void UninitPlayer(void)
 }
 
 //=============================================================================
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 //=============================================================================
 void UpdatePlayer(void)
 {			
@@ -76,17 +76,17 @@ void UpdatePlayer(void)
 
 	if (GetKeyboardPress(DIK_LCONTROL) || GetKeyboardPress(DIK_RCONTROL) || IsButtonPressed(0, BUTTON_Y))
 		speed_boost = 2.0f;
-	// ƒAƒjƒ[ƒVƒ‡ƒ“	
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³	
 	player->countAnim+= player->speed * speed_boost*0.1f;
 	if (player->moving_cooldown > 0)
 	{
 		player->patternAnim = (int)(player->countAnim) % ANIM_PATTERN_NUM;
-		// ƒeƒNƒXƒ`ƒƒÀ•W‚ğİ’è
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã‚’è¨­å®š
 		SetTexturePlayer(player->direction,player->patternAnim);
 		if (player->patternAnim == 1 || player->patternAnim == 6)
 			player->moving_cooldown--;
 	}
-	// “ü—Í‘Î‰
+	// å…¥åŠ›å¯¾å¿œ
 	if (GetKeyboardPress(DIK_DOWN) || IsButtonPressed(0, BUTTON_DOWN))
 	{
 		player->moving_cooldown = 1;
@@ -127,7 +127,7 @@ void UpdatePlayer(void)
 	}
 	else if (player->pos.x > SCREEN_WIDTH - TEXTURE_PLAYER_SIZE_X)
 	{
-		//‰E‚ÉƒXƒN[ƒ‹
+		//å³ã«ã‚¹ã‚¯ãƒ¼ãƒ«
 		player->pos.x = SCREEN_WIDTH - TEXTURE_PLAYER_SIZE_X;
 	}
 	else if (player->pos.y < SCREEN_HEIGHT /4)
@@ -139,8 +139,8 @@ void UpdatePlayer(void)
 		player->pos.y = SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y;
 	}
 
-	// œ’†’Ç‰Á•”•ª ƒS[ƒ‹‚ªŒ©‚¦‚Ä‚È‚¢‚Æ‚«‚Í‚±‚Ìˆ—
-	// ƒS[ƒ‹‚ªŒ©‚¦‚Ä‚¢‚é‚Æ‚«‚Í‰æ–Ê’[‚Ü‚ÅˆÚ“®‚Å‚«‚é‚ç‚µ‚¢
+	// â—ä¸­è¾¼è¿½åŠ éƒ¨åˆ† ã‚´ãƒ¼ãƒ«ãŒè¦‹ãˆã¦ãªã„ã¨ãã¯ã“ã®å‡¦ç†
+	// ã‚´ãƒ¼ãƒ«ãŒè¦‹ãˆã¦ã„ã‚‹ã¨ãã¯ç”»é¢ç«¯ã¾ã§ç§»å‹•ã§ãã‚‹ã‚‰ã—ã„
 	if (player->pos.x > RIGHT_SCROLL_LINE_X)
 	{
 		player->pos.x = RIGHT_SCROLL_LINE_X;
@@ -150,77 +150,77 @@ void UpdatePlayer(void)
 		player->pos.x = LEFT_SCROLL_LINE_X;
 	}
 
-	// ˆÚ“®Œã‚ÌÀ•W‚Å’¸“_‚ğİ’è
+	// ç§»å‹•å¾Œã®åº§æ¨™ã§é ‚ç‚¹ã‚’è¨­å®š
 	SetVertexPlayer();
 }
 
 //=============================================================================
-// •`‰æˆ—
+// æç”»å‡¦ç†
 //=============================================================================
 void DrawPlayer(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	PLAYER *player = GetPlayer(0);
-	// ’¸“_ƒtƒH[ƒ}ƒbƒg‚Ìİ’è
+	// é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®è¨­å®š
 	pDevice->SetFVF(FVF_VERTEX_2D);
-	// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®š
 	BULLET *bullet = GetBullet(0);
 	if (bullet->use)
 		pDevice->SetTexture(0, player->texture[1]);
 	else
 		pDevice->SetTexture(0, player->texture[0]);
-	// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
+	// ãƒãƒªã‚´ãƒ³ã®æç”»
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, player->vtx, sizeof(VERTEX_2D));
 }
 
 //=============================================================================
-// ’¸“_‚Ìì¬
+// é ‚ç‚¹ã®ä½œæˆ
 //=============================================================================
 HRESULT MakeVertexPlayer(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	PLAYER *player = GetPlayer(0);
-	// ’¸“_À•W‚Ìİ’è
+	// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
 	SetVertexPlayer();
-	// rhw‚Ìİ’è
+	// rhwã®è¨­å®š
 	player->vtx[0].rhw =
 	player->vtx[1].rhw =
 	player->vtx[2].rhw =
 	player->vtx[3].rhw = 1.0f;
-	// ”½ËŒõ‚Ìİ’è
+	// åå°„å…‰ã®è¨­å®š
 	player->vtx[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 	player->vtx[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 	player->vtx[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 	player->vtx[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 	player->vtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
 	player->vtx[1].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 0.0f);
 	player->vtx[2].tex = D3DXVECTOR2(0.0f, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
 	player->vtx[3].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
-	// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®š
 	SetTexturePlayer(player->direction,player->patternAnim);
 	return S_OK;
 }
 
 //=============================================================================
-// ’¸“_À•W‚Ìİ’è
+// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
 //=============================================================================
 void SetVertexPlayer(void)
 {
 	PLAYER *player = GetPlayer(0);
-	// ’¸“_À•W‚Ìİ’è
+	// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
 	player->vtx[0].vtx = D3DXVECTOR3(player->pos.x,	player->pos.y,0);
 	player->vtx[1].vtx = D3DXVECTOR3(player->pos.x + TEXTURE_PLAYER_SIZE_X,	player->pos.y,0);
 	player->vtx[2].vtx = D3DXVECTOR3(player->pos.x,	player->pos.y + TEXTURE_PLAYER_SIZE_Y,0);
 	player->vtx[3].vtx = D3DXVECTOR3(player->pos.x + TEXTURE_PLAYER_SIZE_X,	player->pos.y + TEXTURE_PLAYER_SIZE_Y,0);
 }
 //=============================================================================
-// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 //=============================================================================
 void SetTexturePlayer(int dir, int cntPattern )
 {
 	PLAYER *player = GetPlayer(0);
-	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 	int x = cntPattern % TEXTURE_PATTERN_DIVIDE_X;
 	int y = cntPattern / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeX = 1.0f / TEXTURE_PATTERN_DIVIDE_X;
@@ -242,10 +242,10 @@ void SetTexturePlayer(int dir, int cntPattern )
 	}
 }
 /*******************************************************************************
-ŠÖ”–¼:	PLAYER *GetMapAdr( int pno )
-ˆø”:	int pno : ƒvƒŒƒCƒ„[”Ô†
-–ß‚è’l:	PLAYER *
-à–¾:	ƒvƒŒƒCƒ„[‚ÌƒAƒhƒŒƒX‚ğæ“¾‚·‚é
+é–¢æ•°å:	PLAYER *GetMapAdr( int pno )
+å¼•æ•°:	int pno : ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç•ªå·
+æˆ»ã‚Šå€¤:	PLAYER *
+èª¬æ˜:	ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹
 *******************************************************************************/
 PLAYER *GetPlayer(int pno)
 {

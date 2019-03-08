@@ -26,11 +26,18 @@
 // サウンドファイルのパス（hの通しナンバーと合わせること）
 const TCHAR* c_soundFilename[] = {
 	// SE
-
-	// ME
+	_T("data/SOUND/SE/Attack.wav"),
+	_T("data/SOUND/SE/gameclear.wav"),
+	_T("data/SOUND/SE/gameover.wav"),
+	_T("data/SOUND/SE/item.wav"),
+	_T("data/SOUND/SE/PlayerDamage.wav"),
+	_T("data/SOUND/SE/TargetDamage.wav"),
+	_T("data/SOUND/SE/walk.wav"),
 
 	// BGM
-	_T("data/SOUND/BGM/bgm_title.wav"),
+	_T("data/SOUND/BGM/title.wav"),
+	_T("data/SOUND/BGM/gamegamen.wav"),
+	_T("data/SOUND/BGM/muteki.wav"),
 };
 
 
