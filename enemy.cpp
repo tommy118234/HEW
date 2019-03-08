@@ -101,15 +101,15 @@ void UpdateEnemy(void)
 				SetTextureEnemy(i, enemy->patternAnim);			
 			//}
 			enemy->pos.x += enemy->direction*enemy->speed * 3.0f;
-			if (enemy->pos.x < 0 || enemy->pos.x > SCREEN_WIDTH)
-				enemy->use = false;
 			//// 移動後の座標で頂点を設定
 			SetVertexEnemy(i);
+			if (enemy->pos.x < 0 || enemy->pos.x > SCREEN_WIDTH)
+				enemy->use = false;
 		}
 		else
 		{
 			enemy_count++;
-			if (enemy_count>enemy_rate)			
+			if (enemy_count>enemy_rate&& !enemy->use)			
 			SetEnemy();
 		}
 	}
@@ -118,12 +118,12 @@ void UpdateEnemy(void)
 //=============================================================================
 // 描画処理
 //=============================================================================
-void DrawEnemy(void)
+void DrawEnemy(int pno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	ENEMY *enemy = GetEnemy(0);
-	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
-	{
+	ENEMY *enemy = GetEnemy(pno);
+	//for (int i = 0; i < ENEMY_MAX; i++, enemy++)
+	//{
 		if (enemy->use)					// 使用している状態なら更新する
 		{
 			// テクスチャの設定
@@ -131,7 +131,7 @@ void DrawEnemy(void)
 			// ポリゴンの描画
 			pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_BULLET, enemy->vtx, sizeof(VERTEX_2D));
 		}
-	}
+	//}
 }
 
 //=============================================================================

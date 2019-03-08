@@ -54,7 +54,7 @@ GAMEDATA			gameData;				// ゲーム進行データセット
 #ifdef _DEBUG
 int					cntFPS;					// FPSカウンタ
 #endif
-
+int					player_cnt;
 
 //=============================================================================
 // メイン関数
@@ -416,6 +416,9 @@ void Draw(void)
 	PLAYER *player = GetPlayer(0);
 	ENEMY  *enemy = GetEnemy(0);
 	BULLET  *bullet = GetBullet(0);
+	int i;
+
+	D3DXVECTOR3 player_center, enemy_center;
 
 	// Direct3Dによる描画の開始
 	if(SUCCEEDED(pD3DDevice->BeginScene()))
@@ -436,18 +439,35 @@ void Draw(void)
 		case GAME:
 			DrawBg();					// BGの描画
 			DrawRoad();					// 道の描画
-			if (player->pos.y < enemy->pos.y)
+
+			player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
+			PrintDebugProc(1, "P : %f\n", player_center.y);
+			for (i = 0; i < ENEMY_MAX; i++,enemy++)
 			{
-				DrawPlayer();				// プレイヤーの描画
-				DrawBullet();				// バレットの描画
-				DrawEnemy();				// ENEMYの描画
+				if (enemy->use ==true) 
+				{
+					enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
+					PrintDebugProc(1, "%d  %f\n",i+1, enemy_center.y);
+					if (player_center.y > enemy_center.y)
+					{
+						DrawEnemy(i);				// ENEMYの描画	
+					}
+					else
+					{
+						DrawPlayer();
+						break;
+					}
+				}
 			}
-			else
+			if (i == ENEMY_MAX)
+				DrawPlayer();
+			while (i <  ENEMY_MAX)
 			{
-				DrawEnemy();				// ENEMYの描画
-				DrawPlayer();				// プレイヤーの描画
-				DrawBullet();				// バレットの描画				
+				DrawEnemy(i);
+				i++;
+				enemy++;
 			}
+
 			// UI
 			DrawTimer();				// タイマーの描画
 			DrawScore();				// スコアの描画
@@ -531,8 +551,12 @@ GAMEDATA *GetGameData(void)
 //=============================================================================
 bool CheckHitBB(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, D3DXVECTOR2 size1, D3DXVECTOR2 size2)
 {	
-	if (pos1.x > pos2.x && pos1.x+size1.x < pos2.x + size2.x &&
- 		pos1.y > pos2.y && pos1.y+size1.y < pos2.y + size2.y)
+
+	size1 /= 2.0f;	// 半サイズにする
+	size2 /= 2.0f;	// 同上
+
+	if (pos1.x + size1.x > pos2.x - size2.x && pos2.x + size2.x > pos1.x - size1.x &&
+		pos1.y + size1.y > pos2.y - size2.y && pos2.y + size2.y > pos1.y - size1.y)
 	{
 		return true;
 	}
@@ -567,14 +591,15 @@ void CheckHit(void)
 	D3DXVECTOR2 enemy_size = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
 	D3DXVECTOR2 bullet_size = D3DXVECTOR2(TEXTURE_BULLET_SIZE_X, TEXTURE_BULLET_SIZE_Y);
 
-
+	player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
+	//enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
+	//bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2, 0);
 	// 敵と操作キャラ(BB)
 	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	{
 		if (enemy->use == false)	continue;
-
-		if (CheckHitBB(player->pos, enemy->pos, player_size ,enemy_size))
-		//if (CheckHitBC(player->pos, enemy->pos, player->radius, enemy->radius))
+		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
+		if (CheckHitBB(player_center, enemy_center, player_size ,enemy_size))
 		{
 			//enemy->use = false;
 			player->status.HP --;
@@ -587,13 +612,12 @@ void CheckHit(void)
 	for (int j = 0; j < ENEMY_MAX; j++, enemy++)
 	{
 		if (enemy->use == false) continue;
+		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
 		for (int i = 0; i < BULLET_MAX; i++, bullet++)
 		{
 			if (bullet->use == false) continue;
-			if (CheckHitBB(bullet->pos, enemy->pos, bullet_size*2, enemy_size)||
-				CheckHitBB(enemy->pos, bullet->pos , enemy_size,bullet_size*2))
-
-			//if (CheckHitBC(bullet->pos, enemy->pos, bullet->radius, enemy->radius))
+			bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2, 0);
+			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size) && bullet->use)
 			{
 				//bullet->use = false;		// 弾の消滅処理を行い
 				//敵HP減少アニメ
@@ -604,11 +628,6 @@ void CheckHit(void)
 			}
 		}
 	}
-	//PrintDebugProc(2, "Bullet(x,y):%f,%f	Enemy(x,y)%f,%f", bullet->pos.x, bullet->pos.y, enemy->pos.x, enemy->pos.y);
-
-
-	PrintDebugProc(1, "Bullet(%f,%f)\nEnemy(%f,%f)\n", bullet->pos.x, bullet->pos.y, enemy->pos.x, enemy->pos.y);
-	PrintDebugProc(1, "Enemy_Size(%f,%f)\n Bullet_Size(%f,%f)\n", enemy_size.x, enemy_size.y, bullet_size.x, bullet_size.y);
 }
 
 #ifdef _DEBUG
