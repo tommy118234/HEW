@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// ƒ|ƒŠƒSƒ“ˆ— [enemy.h]
+// ãƒãƒªã‚´ãƒ³å‡¦ç† [enemy.h]
 // Author : 
 //
 //=============================================================================
@@ -11,27 +11,27 @@
 
 #define TEXTURE_GAME_ENEMY1		_T("data/TEXTURE/enemy1.png")
 #define TEXTURE_GAME_ENEMY2		_T("data/TEXTURE/enemy2.png")
-#define TEXTURE_ENEMY_SIZE_X	(140) // ƒeƒNƒXƒ`ƒƒƒTƒCƒY
-#define TEXTURE_ENEMY_SIZE_Y	(200) // “¯ã
+#define TEXTURE_ENEMY_SIZE_X	(140) // ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚µã‚¤ã‚º
+#define TEXTURE_ENEMY_SIZE_Y	(200) // åŒä¸Š
 
-#define TEXTURE_PATTERN_DIVIDE_X	(5)	// ƒAƒjƒƒpƒ^[ƒ“‚ÌƒeƒNƒXƒ`ƒƒ“à•ªŠ„”iX)
-#define TEXTURE_PATTERN_DIVIDE_Y	(2)	// ƒAƒjƒƒpƒ^[ƒ“‚ÌƒeƒNƒXƒ`ƒƒ“à•ªŠ„”iY)
-#define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// ƒAƒjƒ[ƒVƒ‡ƒ“ƒpƒ^[ƒ“”
+#define TEXTURE_PATTERN_DIVIDE_X	(5)	// ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£å†…åˆ†å‰²æ•°ï¼ˆX)
+#define TEXTURE_PATTERN_DIVIDE_Y	(2)	// ã‚¢ãƒ‹ãƒ¡ãƒ‘ã‚¿ãƒ¼ãƒ³ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£å†…åˆ†å‰²æ•°ï¼ˆY)
+#define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‘ã‚¿ãƒ¼ãƒ³æ•°
 
-#define ENEMY_MAX	(4)			// ƒvƒŒƒCƒ„[‚Ì”
+#define ENEMY_MAX	(4)			// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®æ•°
 /*******************************************************************************
-* \‘¢‘Ì’è‹`
+* æ§‹é€ ä½“å®šç¾©
 ********************************************************************************/
-struct	ENEMY				// ƒLƒƒƒ‰ƒNƒ^[‚ÌŠî–{\‘¢‘Ì
+struct	ENEMY				// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®åŸºæœ¬æ§‹é€ ä½“
 {
-	CHARACTER				status;			// ‹¤’Êƒpƒ‰ƒ[ƒ^[
-	bool					use;			// true:g—p  false:–¢g—p
-	D3DXVECTOR3				pos;			// ƒ|ƒŠƒSƒ“‚ÌˆÚ“®—Ê
-	int						patternAnim;	// ƒAƒjƒ[ƒVƒ‡ƒ“ƒpƒ^[ƒ“ƒiƒ“ƒo[
-	float					countAnim;		// ƒAƒjƒ[ƒVƒ‡ƒ“ƒJƒEƒ“ƒg	
+	CHARACTER				status;			// å…±é€šãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
+	bool					use;			// true:ä½¿ç”¨  false:æœªä½¿ç”¨
+	D3DXVECTOR3				pos;			// ãƒãƒªã‚´ãƒ³ã®ç§»å‹•é‡
+	int						patternAnim;	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ‘ã‚¿ãƒ¼ãƒ³ãƒŠãƒ³ãƒãƒ¼
+	float					countAnim;		// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚«ã‚¦ãƒ³ãƒˆ	
 	int						type;
-	VERTEX_2D				vtx[NUM_VERTEX];// ’¸“_î•ñŠi”[ƒ[ƒN
-	float					radius;			// ƒ|ƒŠƒSƒ“‚ÌŠp“x	
+	VERTEX_2D				vtx[NUM_VERTEX];// é ‚ç‚¹æƒ…å ±æ ¼ç´ãƒ¯ãƒ¼ã‚¯
+	float					radius;			// ãƒãƒªã‚´ãƒ³ã®è§’åº¦	
 	float					baseAngle;
 	int						direction = -1;
 	int						moving_cooldown = -1;
@@ -39,11 +39,11 @@ struct	ENEMY				// ƒLƒƒƒ‰ƒNƒ^[‚ÌŠî–{\‘¢‘Ì
 };
 
 //*****************************************************************************
-// ƒvƒƒgƒ^ƒCƒvéŒ¾
+// ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 //*****************************************************************************
 HRESULT InitEnemy(int type);
 void	UninitEnemy(void);
 void	UpdateEnemy(void);
 void	DrawEnemy(int pno);
-ENEMY   *GetEnemy(int pno);	// ƒvƒŒƒCƒ„[‚Ì(ƒAƒhƒŒƒX)‚ğæ“¾
+ENEMY   *GetEnemy(int pno);	// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®(ã‚¢ãƒ‰ãƒ¬ã‚¹)ã‚’å–å¾—
 #endif

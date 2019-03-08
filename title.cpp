@@ -1,7 +1,7 @@
 //=============================================================================
 //
-// ƒ^ƒCƒgƒ‹ˆ— [title.cpp]
-// Author : HAL“Œ‹’‹ŠÔ•” 2”N§ƒQ[ƒ€Šw‰È GP11B341 24 ’†˜a‹P
+// ã‚¿ã‚¤ãƒˆãƒ«å‡¦ç† [title.cpp]
+// Author : HALæ±äº¬æ˜¼é–“éƒ¨ 2å¹´åˆ¶ã‚²ãƒ¼ãƒ å­¦ç§‘ GP11B341 24 ä¸­è¾¼å’Œè¼
 //
 //=============================================================================
 #include "main.h"
@@ -13,38 +13,38 @@
 
 
 //*****************************************************************************
-// ƒ}ƒNƒ’è‹`
+// ãƒã‚¯ãƒ­å®šç¾©
 //*****************************************************************************
-// ƒeƒNƒXƒ`ƒƒêŠ
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£å ´æ‰€
 #define TEXTURE_TITLE			_T("data/TEXTURE/title.png")
 #define TEXTURE_MENU_START		_T("data/TEXTURE/start.png")
 #define TEXTURE_MENU_EXIT		_T("data/TEXTURE/exit.png")
 #define TEXTURE_CURSOR			_T("data/TEXTURE/cursor.png")
 
-// ƒ^ƒCƒgƒ‹‚ÌƒTƒCƒY
+// ã‚¿ã‚¤ãƒˆãƒ«ã®ã‚µã‚¤ã‚º
 #define TITLE_SIZE_X			(SCREEN_WIDTH)
 #define TITLE_SIZE_Y			(SCREEN_HEIGHT)	
 
-// ƒ^ƒCƒgƒ‹‚ÌÀ•W
+// ã‚¿ã‚¤ãƒˆãƒ«ã®åº§æ¨™
 #define INIT_POS_X				(0.0f)
 #define MOVE_SPEED_X			(1.0f)
 
-// ƒƒjƒ…\‚Ìí—Ş
+// ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½\ï¿½Ìï¿½ï¿½
 enum MENU_TYPE
 {
-	MENU_START,					// ƒQ[ƒ€ƒXƒ^[ƒg
-	MENU_EXIT,					// ƒQ[ƒ€I—¹
-	MENU_TYPE_MAX				// ƒƒjƒ…[‚Ì”
+	MENU_START,					// ï¿½Qï¿½[ï¿½ï¿½ï¿½Xï¿½^ï¿½[ï¿½g
+	MENU_EXIT,					// ï¿½Qï¿½[ï¿½ï¿½ï¿½Iï¿½ï¿½
+	MENU_TYPE_MAX				// ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[ï¿½Ìï¿½
 };
 
-// ƒƒjƒ…[
+// ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[
 #define MENU_SIZE_X				(250.0f)
 #define MENU_SIZE_Y				(150.0f)
 #define START_POS_X				(200.0f)
 #define EXIT_POS_X				(500.0f)
 #define MENU_POS_Y				(450.0f)
 
-// ƒJ[ƒ\ƒ‹
+// ï¿½Jï¿½[ï¿½\ï¿½ï¿½
 #define CURSOR_SIZE_X			(45.0f)
 #define CURSOR_SIZE_Y			(80.0f)
 #define CURSOR_POS_X			(500.0f)
@@ -52,63 +52,64 @@ enum MENU_TYPE
 
 
 //*****************************************************************************
-// ƒvƒƒgƒ^ƒCƒvéŒ¾
+// ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 //*****************************************************************************
-HRESULT MakeVertexTitle(void);					// ’¸“_‚Ìì¬
-void SetVertexTitle(void);						// ’¸“_À•W‚Ìİ’è
-void SetColorTitle(void);						// ’¸“_ƒJƒ‰[‚Ìİ’è
-void SetTextureTitle(void);						// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+HRESULT MakeVertexTitle(void);				// é ‚ç‚¹ã®ä½œæˆ
+void SetVertexTitle(void);					// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
+void SetColorTitle(void);					// é ‚ç‚¹ã‚«ãƒ©ãƒ¼ã®è¨­å®š
+void SetTextureTitle(void);					// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 
 
+
 //*****************************************************************************
-// ƒOƒ[ƒoƒ‹•Ï”
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°
 //*****************************************************************************
 GAMETITLE title;
 int	selectNo;	
 
-// @QUADRANGLE\‘¢‘Ì‚Åè”²‚«À‘•
-QUADRANGLE menu[MENU_TYPE_MAX];					// ƒƒjƒ…[
-LPDIRECT3DTEXTURE9 menuTex[MENU_TYPE_MAX];		// ƒƒjƒ…\ƒeƒNƒXƒ`ƒƒ
-QUADRANGLE cursor;								// ƒJ[ƒ\ƒ‹
-LPDIRECT3DTEXTURE9 cursorTex;					// ƒJ[ƒ\ƒ‹ƒeƒNƒXƒ`ƒƒ
+// @QUADRANGLEï¿½\ï¿½ï¿½ï¿½Ì‚Åè”²ï¿½ï¿½ï¿½ï¿½ï¿½
+QUADRANGLE menu[MENU_TYPE_MAX];					// ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[
+LPDIRECT3DTEXTURE9 menuTex[MENU_TYPE_MAX];		// ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½\ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½
+QUADRANGLE cursor;								// ï¿½Jï¿½[ï¿½\ï¿½ï¿½
+LPDIRECT3DTEXTURE9 cursorTex;					// ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½
 
 
 //=============================================================================
-// ‰Šú‰»ˆ—
+// åˆæœŸåŒ–å‡¦ç†
 //=============================================================================
 HRESULT InitTitle(int type)
 {
-	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ƒfƒoƒCƒXæ“¾
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();	// ãƒ‡ãƒã‚¤ã‚¹å–å¾—
 
 	if (type == 0)
 	{
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®èª­ã¿è¾¼ã¿
 		D3DXCreateTextureFromFile(pDevice,
 			TEXTURE_TITLE,
 			&title.pTexture);
 
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
+		// ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½Ì“Ç‚İï¿½ï¿½ï¿½
 		D3DXCreateTextureFromFile(pDevice,
 			TEXTURE_MENU_START,
 			&menuTex[MENU_START]);
 
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
+		// ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½Ì“Ç‚İï¿½ï¿½ï¿½
 		D3DXCreateTextureFromFile(pDevice,
 			TEXTURE_MENU_EXIT,
 			&menuTex[MENU_EXIT]);
 
-		// ƒeƒNƒXƒ`ƒƒ‚Ì“Ç‚İ‚İ
+		// ï¿½eï¿½Nï¿½Xï¿½`ï¿½ï¿½ï¿½Ì“Ç‚İï¿½ï¿½ï¿½
 		D3DXCreateTextureFromFile(pDevice,
 			TEXTURE_CURSOR,
 			&cursorTex);
 	}
 
-	// BG‰Šú‰»
+	// BGï¿½ï¿½ï¿½ï¿½
 	title.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	title.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	MakeVertexTitle();
 
-	// ƒƒjƒ…[
+	// ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[
 	InitQuad(&menu[MENU_START], MENU_SIZE_X, MENU_SIZE_Y);
 	InitQuad(&menu[MENU_EXIT], MENU_SIZE_X, MENU_SIZE_Y);
 	menu[MENU_START].transform.pos = D3DXVECTOR3(START_POS_X, MENU_POS_Y, 0.0f);
@@ -116,7 +117,7 @@ HRESULT InitTitle(int type)
 	SetVertexQuad(&menu[MENU_START]);
 	SetVertexQuad(&menu[MENU_EXIT]);
 
-	// ƒJ[ƒ\ƒ‹
+	// ï¿½Jï¿½[ï¿½\ï¿½ï¿½
 	InitQuad(&cursor, CURSOR_SIZE_X, CURSOR_SIZE_Y);
 	cursor.transform.pos = D3DXVECTOR3(CURSOR_POS_X, CURSOR_POS_Y, 0.0f);
 	SetVertexQuad(&cursor);
@@ -128,7 +129,7 @@ HRESULT InitTitle(int type)
 
 
 //=============================================================================
-// I—¹ˆ—
+// çµ‚äº†å‡¦ç†
 //=============================================================================
 void UninitTitle(void)
 {
@@ -137,39 +138,40 @@ void UninitTitle(void)
 
 
 //=============================================================================
-// XVˆ—
+// æ›´æ–°å‡¦ç†
 //=============================================================================
 void UpdateTitle(void)
 {
-	// BGMÄ¶
+	// BGMå†ç”Ÿ
 	PlayGameSound(BGM_TITLE, CONTINUE_SOUND, LOOP);
-
-	// ‘I‘ğ
+	// ï¿½Iï¿½ï¿½
 	if (IsButtonTriggered(0, BUTTON_RIGHT) || GetKeyboardTrigger(DIK_RIGHT)
 		|| IsButtonTriggered(0, BUTTON_LEFT) || GetKeyboardTrigger(DIK_LEFT))
 	{
 		selectNo = selectNo ? MENU_START : MENU_EXIT;
-		PlayGameSound(SE_MENU_CURSOR, INIT_SOUND, NONE);	// ƒJ[ƒ\ƒ‹‰¹
+		PlayGameSound(SE_MENU_CURSOR, INIT_SOUND, NONE);	// ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½ï¿½
 	}
 
-	// Œˆ’è
+	// ï¿½ï¿½ï¿½ï¿½
 	if (IsButtonTriggered(0, BUTTON_A) || IsButtonTriggered(0, BUTTON_X)
 		|| GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
 	{
-		StopAllSound(INIT_SOUND);							// ‰¹‚ğ‘S‚Ä~‚ß‚é
-		PlayGameSound(SE_MENU_DECISION, INIT_SOUND, NONE);	// Œˆ’è‰¹
-		if (selectNo == MENU_START) SetStage(GAME);			// ƒQ[ƒ€‚É‘JˆÚ
-		if (selectNo == MENU_EXIT)	SetStage(EXIT);			// ƒQ[ƒ€I—¹
+		StopAllSound(INIT_SOUND);							// ï¿½ï¿½ï¿½ï¿½Sï¿½Ä~ï¿½ß‚ï¿½
+		PlayGameSound(SE_MENU_DECISION, INIT_SOUND, NONE);	// ï¿½ï¿½ï¿½è‰¹
+		if (selectNo == MENU_START) SetStage(GAME);			// ï¿½Qï¿½[ï¿½ï¿½ï¿½É‘Jï¿½ï¿½
+		if (selectNo == MENU_EXIT)	SetStage(EXIT);			// ï¿½Qï¿½[ï¿½ï¿½ï¿½Iï¿½ï¿½
 	}
 
-	// ƒJ[ƒ\ƒ‹‚ÌêŠ
+	// ï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½ÌêŠ
 	selectNo ? cursor.transform.pos.x = EXIT_POS_X : cursor.transform.pos.x = START_POS_X;
 	SetVertexQuad(&cursor);
 
-	// ƒƒjƒ…[
+	// ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[
 	for (int i = 0; i < MENU_TYPE_MAX; i++)
 	{
 		menu[i].radius = menu[i].originalRadius;
+
+
 	}
 	menu[selectNo].radius = menu[selectNo].radius * 1.2f;
 	SetVertexQuad(&menu[MENU_START]);
@@ -178,47 +180,50 @@ void UpdateTitle(void)
 
 
 //=============================================================================
-// •`‰æˆ—
+// æç”»å‡¦ç†
 //=============================================================================
 void DrawTitle(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// ’¸“_ƒtƒH[ƒ}ƒbƒg‚Ìİ’è
+	// é ‚ç‚¹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®è¨­å®š
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	// ƒ^ƒCƒgƒ‹BG
+
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®è¨­å®š
 	pDevice->SetTexture(0, title.pTexture);
+
+	// ãƒãƒªã‚´ãƒ³ã®æç”»
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, title.vertexWk, sizeof(VERTEX_2D));
 
-	// ƒƒjƒ…[
+	// ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½[
 	for (int i = 0; i < MENU_TYPE_MAX; i++)
 	{
 		pDevice->SetTexture(0, menuTex[i]);
 		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, menu[i].vertexWk, sizeof(VERTEX_2D));
 	}
 
-	// ƒJ[ƒ\ƒ‹
+	// ï¿½Jï¿½[ï¿½\ï¿½ï¿½
 	pDevice->SetTexture(0, cursorTex);
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, cursor.vertexWk, sizeof(VERTEX_2D));
 }
 
 
 //=============================================================================
-// ’¸“_‚Ìì¬
+// é ‚ç‚¹ã®ä½œæˆ
 //=============================================================================
 HRESULT MakeVertexTitle(void)
 {
-	// ’¸“_À•W‚Ìİ’è	
+	// é ‚ç‚¹åº§æ¨™ã®è¨­å®š	
 	SetVertexTitle();
 
-	// ’¸“_ƒJƒ‰[‚Ìİ’è
+	// é ‚ç‚¹ã‚«ãƒ©ãƒ¼ã®è¨­å®š
 	SetColorTitle();
 
-	// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 	SetTextureTitle();
 
-	// rhw‚Ìİ’è
+	// rhwã®è¨­å®š
 	title.vertexWk[0].rhw =
 		title.vertexWk[1].rhw =
 		title.vertexWk[2].rhw =
@@ -229,7 +234,7 @@ HRESULT MakeVertexTitle(void)
 
 
 //=============================================================================
-// ’¸“_À•W‚Ìİ’è
+// é ‚ç‚¹åº§æ¨™ã®è¨­å®š
 //=============================================================================
 void SetVertexTitle(void)
 {
@@ -241,7 +246,7 @@ void SetVertexTitle(void)
 
 
 //=============================================================================
-// ’¸“_ƒJƒ‰[‚Ìİ’è
+// é ‚ç‚¹ã‚«ãƒ©ãƒ¼ã®è¨­å®š
 //=============================================================================
 void SetColorTitle(void)
 {
@@ -253,7 +258,7 @@ void SetColorTitle(void)
 
 
 //=============================================================================
-// ƒeƒNƒXƒ`ƒƒÀ•W‚Ìİ’è
+// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™ã®è¨­å®š
 //=============================================================================
 void SetTextureTitle(void)
 {
