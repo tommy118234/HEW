@@ -53,7 +53,7 @@ HRESULT InitEnemy(int type)
 		enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
 								 SCREEN_CENTER_Y/4 + rand() % SCREEN_CENTER_Y,
 								 0.0f);
-		enemy->use = FALSE;
+		enemy->use = false;
 		enemy->countAnim = 0;
 		enemy->patternAnim = 0;
 		enemy->moving_cooldown = 0;
@@ -67,7 +67,8 @@ HRESULT InitEnemy(int type)
 		MakeVertexEnemy(i);
 	}
 	enemy_count = 0;
-	enemy_rate = 100;
+	enemy_rate = 300;
+
 	return S_OK;
 }
 
@@ -89,7 +90,7 @@ void UpdateEnemy(void)
 	// アニメーション	
 	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	{
-		if (enemy->use)
+		if (enemy->use == true)
 		{
 			enemy->countAnim += enemy->speed * 0.3f;
 			//enemy->moving_cooldown = 1;
@@ -103,17 +104,22 @@ void UpdateEnemy(void)
 			enemy->pos.x += enemy->direction*enemy->speed * 3.0f;
 			//// 移動後の座標で頂点を設定
 
-			SetVertexEnemy(i);
 			if (enemy->pos.x < 0 || enemy->pos.x > SCREEN_WIDTH)
 				enemy->use = false;
+
+			SetVertexEnemy(i);
 		}
 		else
 		{
 			enemy_count++;
-			if (enemy_count>enemy_rate&& !enemy->use)			
+			if (enemy_count>enemy_rate)			
 			SetEnemy();
 		}
 	}
+	PrintDebugProc(1, "Enemy1_Z:%f\n", GetEnemy(0)->pos.z);
+	PrintDebugProc(1, "Enemy2_Z:%f\n", GetEnemy(1)->pos.z);
+	PrintDebugProc(1, "Enemy3_Z:%f\n", GetEnemy(2)->pos.z);
+	PrintDebugProc(1, "Enemy4_Z:%f\n", GetEnemy(3)->pos.z);
 }
 
 //=============================================================================
@@ -125,7 +131,7 @@ void DrawEnemy(int pno)
 	ENEMY *enemy = GetEnemy(pno);
 	//for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	//{
-		if (enemy->use)					// 使用している状態なら更新する
+		if (enemy->use == true)					// 使用している状態なら更新する
 		{
 			// テクスチャの設定
 			pDevice->SetTexture(0, enemyTexture[enemy->type]);
@@ -146,7 +152,6 @@ HRESULT MakeVertexEnemy(int no)
 	// 頂点座標の設定
 	SetVertexEnemy(no);
 	// rhwの設定
-
 	enemy->vtx[0].rhw =
 	enemy->vtx[1].rhw =
 	enemy->vtx[2].rhw =
@@ -161,9 +166,7 @@ HRESULT MakeVertexEnemy(int no)
 	enemy->vtx[1].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 0.0f);
 	enemy->vtx[2].tex = D3DXVECTOR2(0.0f, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
 	enemy->vtx[3].tex = D3DXVECTOR2(1.0f / TEXTURE_PATTERN_DIVIDE_X, 1.0f / TEXTURE_PATTERN_DIVIDE_Y);
-
 	// テクスチャの設定
-
 	SetTextureEnemy(no, enemy->patternAnim);
 	return S_OK;
 }
@@ -188,7 +191,6 @@ void SetTextureEnemy(int no, int cntPattern)
 	ENEMY *enemy = GetEnemy(no);
 
 	// テクスチャ座標の設定
-
 	int x = cntPattern % TEXTURE_PATTERN_DIVIDE_X;
 	int y = cntPattern / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeX = 1.0f / TEXTURE_PATTERN_DIVIDE_X;
@@ -220,15 +222,16 @@ void SetEnemy(void)
 		if (enemy->use == false)			// 未使用状態のバレットを見つける
 		{	
 			enemy->use = true;				// 使用状態へ変更する
+			enemy->pos.z = (rand() % ENEMY_MAX);
 			enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
-									 SCREEN_CENTER_Y/4 + rand() % SCREEN_CENTER_Y,
-									 0.0f);	// 座標をセット
+									 SCREEN_HEIGHT * 0.85f + enemy->pos.z*(SCREEN_HEIGHT*0.05f) - TEXTURE_ENEMY_SIZE_Y,
+									 enemy->pos.z);	// 座標をセット
 			enemy->patternAnim = 0;
 			enemy->speed = 1.0f;
 			enemy->direction = -1;
 			enemy->type = rand() % 2;
 			enemy_count = 0;
-			enemy_rate = 60+rand()%41;
+			enemy_rate = 260+rand()%41;
 			return;							// 1発セットしたので終了する
 		}
 	}
