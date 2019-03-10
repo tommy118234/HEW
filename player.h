@@ -28,20 +28,20 @@
 /*******************************************************************************
 * 構造体定義
 ********************************************************************************/
-struct	PLAYER				// キャラクターの基本構造体
+struct	PLAYER										// キャラクターの基本構造体
 {
-	CHARACTER	status;		// 共通パラメーター
-
+	CHARACTER				status;					// 共通パラメーター
 	D3DXVECTOR3				pos;					// ポリゴンの移動量
 	int						patternAnim;			// アニメーションパターンナンバー
 	float					countAnim;				// アニメーションカウント	
-	LPDIRECT3DTEXTURE9		texture[MOVE_MAX];			// テクスチャへのポリゴン
+	LPDIRECT3DTEXTURE9		texture[MOVE_MAX];		// テクスチャへのポリゴン
 	VERTEX_2D				vtx[NUM_VERTEX];		// 頂点情報格納ワーク
 	float					radius;					// ポリゴンの角度	
 	float					baseAngle;
 	int						direction = -1;
 	int						moving_cooldown = -1;	
 	int						speed;
+	float					speed_boost;
 };
 
 //*****************************************************************************

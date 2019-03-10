@@ -391,7 +391,6 @@ void Update(void)
 		UpdateTimer();				// タイマーの更新
 		UpdateScore();				// スコアの更新
 		UpdateLife();				// ライフの更新
-
 		CheckHit();
 		break;
 
@@ -449,13 +448,13 @@ void Draw(void)
 			PrintDebugProc(1, "P : %f\n", player_center.y);
 			for (i = 0; i < ENEMY_MAX; i++,enemy++)
 			{
-				if (enemy->use ==true) 
+				if (enemy->use == true) 
 				{
 					enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
 					PrintDebugProc(1, "%d  %f\n",i+1, enemy_center.y);
-					if (player_center.y > enemy_center.y)
+					if (player->pos.y > enemy->pos.y)
 					{
-						DrawEnemy(i);	// ENEMYの描画	
+						DrawEnemy(i);	 // ENEMYの描画	
 					}
 					else
 					{
@@ -503,7 +502,7 @@ void Draw(void)
 
 	// バックバッファとフロントバッファの入れ替え
 	pD3DDevice->Present(NULL, NULL, NULL, NULL);
-	PrintDebugProc(1, "%f %f \n %f %f \n", player_center.x, player_center.y, enemy_center.x, enemy_center.y);
+//PrintDebugProc(1, "%f %f \n %f %f \n", player_center.x, player_center.y, enemy_center.x, enemy_center.y);
 }
 
 
@@ -594,27 +593,29 @@ void CheckHit(void)
 	BULLET *bullet = GetBullet(0);			// バレットのポインターを初期化
 
 	D3DXVECTOR3 player_center, enemy_center, bullet_center;
-	D3DXVECTOR2 player_size = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X, TEXTURE_PLAYER_SIZE_Y);
+	D3DXVECTOR2 player_size = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X/2, TEXTURE_PLAYER_SIZE_Y/2);
 	D3DXVECTOR2 enemy_size = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
 	D3DXVECTOR2 bullet_size = D3DXVECTOR2(TEXTURE_BULLET_SIZE_X, TEXTURE_BULLET_SIZE_Y);
 
 	player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
-	//enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
-	//bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2, 0);
 	// 敵と操作キャラ(BB)
 	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	{
 		if (enemy->use == false)	continue;
 		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
-		if (CheckHitBB(player_center, enemy_center, player_size ,enemy_size))
+		if (CheckHitBB(player_center, enemy_center, player_size ,enemy_size) &&
+			player->pos.z == enemy->pos.z)
 		{
 			enemy->use = false;
+
 			player->status.HP --;
-			//player->pos = D3DXVECTOR3(SCREEN_WIDTH / 2 - TEXTURE_PLAYER_SIZE_X / 2, SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y, 0.0f);
+			if (player->status.HP == 0)
+			{
+				StopAllSound(INIT_SOUND);	// 音を全て止める
+				SetStage(RESULT);			// ステージ遷移
+			}
 		}
 	}
-
-
 	// ボスと弾(BC) // bullet(heavy) inner loop, enemy(light) outer loop
 	enemy = GetEnemy(0);					// エネミーのポインターを初期化
 	for (int j = 0; j < ENEMY_MAX; j++, enemy++)
@@ -625,14 +626,14 @@ void CheckHit(void)
 		{
 			if (bullet->use == false) continue;
 			bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2, 0);
-			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size) && bullet->use)
+			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size))
 			{
-        //bullet->use = false;		// 弾の消滅処理を行い
 				//敵HP減少アニメ
 				if (enemy->type == 1)
 					enemy->use = false;
 				else
 					enemy->direction = 1;
+
 			}
 		}
 	}

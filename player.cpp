@@ -8,6 +8,7 @@
 #include "input.h"
 #include "bullet.h"
 #include "debugproc.h"
+#include "road.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -47,7 +48,7 @@ HRESULT InitPlayer(int type)
 	player->direction = 1;
 	player->moving_cooldown = 0;
 	player->speed = 3.0f;
-	player->status.ATK = 5;
+	player->status.HP = 6;
 	D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X, TEXTURE_PLAYER_SIZE_Y);
 	player->radius = D3DXVec2Length(&temp);
 	player->baseAngle = atan2f(TEXTURE_PLAYER_SIZE_Y, TEXTURE_PLAYER_SIZE_X);	// プレイヤーの角度を初期化
@@ -71,68 +72,62 @@ void UninitPlayer(void)
 //=============================================================================
 void UpdatePlayer(void)
 {			
-	float speed_boost=1;
 	PLAYER *player = GetPlayer(0);
-
+	player->speed_boost = 1;
 	if (GetKeyboardPress(DIK_LCONTROL) || GetKeyboardPress(DIK_RCONTROL) || IsButtonPressed(0, BUTTON_Y))
-		speed_boost = 2.0f;
+		player->speed_boost = 2.0f;
 	// アニメーション	
-	player->countAnim+= player->speed * speed_boost*0.1f;
+	player->countAnim+= player->speed * player->speed_boost*0.1f;
 	if (player->moving_cooldown > 0)
 	{
 		player->patternAnim = (int)(player->countAnim) % ANIM_PATTERN_NUM;
 		// テクスチャ座標を設定
 		SetTexturePlayer(player->direction,player->patternAnim);
-		if (player->patternAnim == 1 || player->patternAnim == 6)
+		if (player->patternAnim == 6)
 			player->moving_cooldown--;
 	}
 	// 入力対応
 	if (GetKeyboardPress(DIK_DOWN) || IsButtonPressed(0, BUTTON_DOWN))
 	{
 		player->moving_cooldown = 1;
-		player->pos.y += player->speed * speed_boost;
+		player->pos.y += player->speed * player->speed_boost;
 	}
 	if (GetKeyboardPress(DIK_UP) ||	IsButtonPressed(0, BUTTON_UP))
 	{
 		player->moving_cooldown = 1;
-		player->pos.y -= player->speed * speed_boost;
+		player->pos.y -= player->speed * player->speed_boost;
 	}
 	if (GetKeyboardPress(DIK_LEFT) || IsButtonPressed(0, BUTTON_LEFT)) 
 	{
 		player->moving_cooldown = 1;
 		player->direction = -1;
-		player->pos.x -= player->speed * speed_boost;
+		player->pos.x -= player->speed * player->speed_boost;
 	}
 	if (GetKeyboardPress(DIK_RIGHT)	|| IsButtonPressed(0, BUTTON_RIGHT))
 	{
 		player->moving_cooldown = 1;
 		player->direction = 1;
-		player->pos.x += player->speed * speed_boost;
+		player->pos.x += player->speed * player->speed_boost;
 	}
 	if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTriggered(0, BUTTON_A))
 	{
 		D3DXVECTOR3 player_centre;
-		if (player->direction == -1)
-			player_centre.x = player->pos.x;
-		else
-			player_centre.x = player->pos.x + TEXTURE_PLAYER_SIZE_X;
+		player_centre.x = player->pos.x + player->direction * TEXTURE_PLAYER_SIZE_X / 2;
 		player_centre.y = player->pos.y + TEXTURE_PLAYER_SIZE_Y;
 		SetBullet(player_centre,player->status.ATK, player->direction);
-
-		//SetBullet(player->pos, player->status.ATK, player->direction);
 	}
+
 	if (player->pos.x < 0)
 	{
 		player->pos.x = 0;
 	}
 	else if (player->pos.x > SCREEN_WIDTH - TEXTURE_PLAYER_SIZE_X)
 	{
-		//右にスクール
 		player->pos.x = SCREEN_WIDTH - TEXTURE_PLAYER_SIZE_X;
 	}
-	else if (player->pos.y < SCREEN_HEIGHT /4)
+	else if (player->pos.y < SCREEN_HEIGHT * 0.85f - TEXTURE_PLAYER_SIZE_Y)
 	{
-		player->pos.y = SCREEN_HEIGHT / 4;
+		player->pos.y = SCREEN_HEIGHT * 0.85f - TEXTURE_PLAYER_SIZE_Y;
 	}
 	else if (player->pos.y > SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y)
 	{
@@ -150,8 +145,29 @@ void UpdatePlayer(void)
 		player->pos.x = LEFT_SCROLL_LINE_X;
 	}
 
+	// Yの座標によって、Z(偽Depth)を変わる
+
+	player->pos.z = 0;
+	if (player->pos.y > SCREEN_HEIGHT * 0.8f - TEXTURE_PLAYER_SIZE_Y/2)
+	{
+		player->pos.z = 3;
+	}
+	else if (player->pos.y > SCREEN_HEIGHT * 0.75f - TEXTURE_PLAYER_SIZE_Y/2)
+	{
+		player->pos.z = 2;
+	}
+
+	else if (player->pos.y > SCREEN_HEIGHT * 0.7f - TEXTURE_PLAYER_SIZE_Y/2)
+	{
+		player->pos.z = 1;
+	}
+	
+
 	// 移動後の座標で頂点を設定
 	SetVertexPlayer();
+
+	PrintDebugProc(1, "Player_Y:%f\n", player->pos.y);
+	PrintDebugProc(1, "Player_Z:%f\n", player->pos.z);
 }
 
 //=============================================================================
@@ -188,9 +204,9 @@ HRESULT MakeVertexPlayer(void)
 	player->vtx[2].rhw =
 	player->vtx[3].rhw = 1.0f;
 	// 反射光の設定
-	player->vtx[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	player->vtx[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	player->vtx[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	player->vtx[0].diffuse = 
+	player->vtx[1].diffuse = 
+	player->vtx[2].diffuse = 
 	player->vtx[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 	// テクスチャ座標の設定
 	player->vtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
