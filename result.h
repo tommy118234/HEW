@@ -33,6 +33,8 @@ struct GAMERESULT {
 	VERTEX_2D						vertexWk[NUM_VERTEX];		// 頂点情報格納ワーク
 	D3DXVECTOR3						pos;						// 座標
 	D3DXVECTOR3						rot;						// 回転
+	int								cntBlink;					// 点滅カウント
+	BOOL							use;						// 使用、不使用
 };
 
 
