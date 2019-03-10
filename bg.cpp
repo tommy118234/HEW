@@ -17,7 +17,7 @@
 #define TEXTURE_BG			_T("data/TEXTURE/bg.png")
 
 // 背景のサイズ
-#define BG_SIZE_X			(SCREEN_WIDTH * 2)
+#define BG_SIZE_X			(SCREEN_WIDTH * 4)
 #define BG_SIZE_Y			(SCREEN_HEIGHT)	
 
 // 背景の座標
@@ -28,10 +28,9 @@
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT MakeVertexBg(void);					// 頂点の作成
-void SetVertexBg(void);						// 頂点座標の設定
-void SetColorBg(void);						// 頂点カラーの設定
-void SetTextureBg(void);					// テクスチャ座標の設定
+HRESULT MakeVertexBg(GAMEBG *bg);				// 頂点の作成
+void SetVertexBg(GAMEBG *bg);					// 頂点座標の設定
+void SetTextureBg(GAMEBG *bg);					// テクスチャ座標の設定
 
 
 //*****************************************************************************
@@ -56,7 +55,7 @@ HRESULT InitBg(int type)
 
 	bg.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	bg.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	MakeVertexBg();
+	MakeVertexBg(&bg);
 
 	return S_OK;
 }
@@ -102,7 +101,7 @@ void UpdateBg(void)
 		bg.pos.x = -BG_SIZE_X / 2;
 	}
 
-	SetVertexBg();
+	SetVertexBg(&bg);
 }
 
 
@@ -127,22 +126,22 @@ void DrawBg(void)
 //=============================================================================
 // 頂点の作成
 //=============================================================================
-HRESULT MakeVertexBg(void)
+HRESULT MakeVertexBg(GAMEBG *bg)
 {
 	// 頂点座標の設定	
-	SetVertexBg();
+	SetVertexBg(bg);
 
 	// 頂点カラーの設定
-	SetColorBg();
+	SetColorBg(bg, D3DCOLOR_RGBA(255, 255, 255, 255));
 
 	// テクスチャ座標の設定
-	SetTextureBg();
+	SetTextureBg(bg);
 
 	// rhwの設定
-	bg.vertexWk[0].rhw =
-		bg.vertexWk[1].rhw =
-		bg.vertexWk[2].rhw =
-		bg.vertexWk[3].rhw = 1.0f;
+	bg->vertexWk[0].rhw =
+		bg->vertexWk[1].rhw =
+		bg->vertexWk[2].rhw =
+		bg->vertexWk[3].rhw = 1.0f;
 
 	return S_OK;
 }
@@ -151,34 +150,43 @@ HRESULT MakeVertexBg(void)
 //=============================================================================
 // 頂点座標の設定
 //=============================================================================
-void SetVertexBg(void)
+void SetVertexBg(GAMEBG *bg)
 {
-	bg.vertexWk[0].vtx = D3DXVECTOR3(bg.pos.x, bg.pos.y, bg.pos.z);
-	bg.vertexWk[1].vtx = D3DXVECTOR3(bg.pos.x + BG_SIZE_X, bg.pos.y, bg.pos.z);
-	bg.vertexWk[2].vtx = D3DXVECTOR3(bg.pos.x, bg.pos.y + BG_SIZE_Y, bg.pos.z);
-	bg.vertexWk[3].vtx = D3DXVECTOR3(bg.pos.x + BG_SIZE_X, bg.pos.y + BG_SIZE_Y, bg.pos.z);
+	bg->vertexWk[0].vtx = D3DXVECTOR3(bg->pos.x, bg->pos.y, bg->pos.z);
+	bg->vertexWk[1].vtx = D3DXVECTOR3(bg->pos.x + BG_SIZE_X, bg->pos.y, bg->pos.z);
+	bg->vertexWk[2].vtx = D3DXVECTOR3(bg->pos.x, bg->pos.y + BG_SIZE_Y, bg->pos.z);
+	bg->vertexWk[3].vtx = D3DXVECTOR3(bg->pos.x + BG_SIZE_X, bg->pos.y + BG_SIZE_Y, bg->pos.z);
 }
 
 
 //=============================================================================
 // 頂点カラーの設定
 //=============================================================================
-void SetColorBg(void)
+void SetColorBg(GAMEBG *bg, D3DCOLOR setCol)
 {
-	bg.vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	bg.vertexWk[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	bg.vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	bg.vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	bg->vertexWk[0].diffuse = setCol;
+	bg->vertexWk[1].diffuse = setCol;
+	bg->vertexWk[2].diffuse = setCol;
+	bg->vertexWk[3].diffuse = setCol;
 }
 
 
 //=============================================================================
 // テクスチャ座標の設定
 //=============================================================================
-void SetTextureBg(void)
+void SetTextureBg(GAMEBG *bg)
 {
-	bg.vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	bg.vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	bg.vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	bg.vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	bg->vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+	bg->vertexWk[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+	bg->vertexWk[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+	bg->vertexWk[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+}
+
+
+//=============================================================================
+// BGの取得
+//=============================================================================
+GAMEBG *GetBg(void)
+{
+	return &bg;
 }

@@ -336,7 +336,6 @@ void Uninit(void)
 	UninitDebugProc();			// デバッグ表示の終了
 #endif
 
-
 	//UninitTitle();			// タイトルの終了処理
 	UninitInput();				// 入力処理の終了処理
 	UninitSound();				// サウンドの終了処理
@@ -445,7 +444,7 @@ void Draw(void)
 
 		case GAME:
 			DrawBg();					// BGの描画
-			DrawRoad();					// 道の描画
+			//DrawRoad();					// 道の描画
 			player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
 			PrintDebugProc(1, "P : %f\n", player_center.y);
 			for (i = 0; i < ENEMY_MAX; i++,enemy++)
@@ -456,7 +455,7 @@ void Draw(void)
 					PrintDebugProc(1, "%d  %f\n",i+1, enemy_center.y);
 					if (player_center.y > enemy_center.y)
 					{
-						DrawEnemy(i);				// ENEMYの描画	
+						DrawEnemy(i);	// ENEMYの描画	
 					}
 					else
 					{
@@ -473,7 +472,7 @@ void Draw(void)
 				i++;
 				enemy++;
 			}
-			//DrawBullet();
+			DrawBullet();
 			// UI
 			DrawTimer();				// タイマーの描画
 			DrawScore();				// スコアの描画
@@ -484,7 +483,10 @@ void Draw(void)
 			break;
 
 		case RESULT:
+			DrawBg();					// BGの描画
+			DrawPlayer();				// プレイヤーの描画
 			DrawResult();				// リザルトの描画
+			DrawScore();				// スコアの描画
 			break;
 
 		case EXIT:
@@ -492,7 +494,7 @@ void Draw(void)
 		}
 
 #ifdef _DEBUG
-		DrawDebugProc();		// デバッグ表示の描画
+		DrawDebugProc();				// デバッグ表示の描画
 #endif
 
 		// Direct3Dによる描画の終了
@@ -606,7 +608,7 @@ void CheckHit(void)
 		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
 		if (CheckHitBB(player_center, enemy_center, player_size ,enemy_size))
 		{
-			//enemy->use = false;
+			enemy->use = false;
 			player->status.HP --;
 			//player->pos = D3DXVECTOR3(SCREEN_WIDTH / 2 - TEXTURE_PLAYER_SIZE_X / 2, SCREEN_HEIGHT - TEXTURE_PLAYER_SIZE_Y, 0.0f);
 		}
