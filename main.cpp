@@ -25,6 +25,8 @@
 #include "result.h"
 #include "score.h"
 #include "life.h"
+#include "item.h"
+#include "panty.h"
 
 
 //*****************************************************************************
@@ -304,6 +306,8 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	InitEnemy(0);				// ENEMYの初期化
 	InitBg(0);					// BGの初期化
 	InitRoad(0);				// 道の初期化
+	InitItem(0);				// アイテムの初期化
+	InitPanty(0);				// パンティの初期化
 	InitTimer(0);				// タイマーの初期化
 	InitScore(0);				// スコア初期化
 	InitLife(0);				// ライフの初期化
@@ -345,6 +349,8 @@ void Uninit(void)
 	UninitEnemy();				// ENEMYの終了処理
 	UninitBg();					// BGの終了処理
 	UninitRoad();				// 道の終了処理
+	UninitItem();				// アイテムの終了処理
+	UninitPanty();				// パンティの終了処理
 	UninitTimer();				// タイマーの終了処理
 	UninitScore();				// スコアの終了処理
 	UninitLife();				// ライフの終了処理
@@ -388,6 +394,8 @@ void Update(void)
 		UpdateEnemy();				// ENEMYの更新
 		UpdateBg();					// BGの更新
 		UpdateRoad();				// 道の更新
+		UpdateItem();				// アイテムの更新
+		UpdatePanty();				// パンティの更新
 		UpdateTimer();				// タイマーの更新
 		UpdateScore();				// スコアの更新
 		UpdateLife();				// ライフの更新
@@ -408,6 +416,8 @@ void Update(void)
 
 #ifdef _DEBUG
 	UpdateDebugProc();				// デバッグ表示の更新
+
+
 #endif
 }
 
@@ -421,7 +431,9 @@ void Draw(void)
 	pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 	PLAYER *player = GetPlayer(0);
 	ENEMY  *enemy = GetEnemy(0);
-	BULLET  *bullet = GetBullet(0);
+	BULLET *bullet = GetBullet(0);
+	ITEM   *item = GetItem();
+
 	int i;
 	D3DXVECTOR3 player_center, enemy_center;
 	//  direct3D による描画の開始
@@ -443,6 +455,9 @@ void Draw(void)
 		case GAME:
 			DrawBg();					// BGの描画
 			DrawRoad();					// 道の描画
+
+			DrawItem();					// アイテムの描画　描画順のソートが未着手
+
 			player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
 			PrintDebugProc(1, "P : %f\n", player_center.y);
 			for (i = 0; i < ENEMY_MAX; i++ ,enemy++)
@@ -471,7 +486,10 @@ void Draw(void)
 				enemy++;
 			}
 			//DrawBullet();
+
+
 			// UI
+			DrawPanty();				// パンティの描画
 			DrawTimer();				// タイマーの描画
 			DrawScore();				// スコアの描画
 			DrawLife();					// ライフの描画
@@ -587,15 +605,28 @@ bool CheckHitBC(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, float radius1, float radius2
 void CheckHit(void)
 {
 	PLAYER *player = GetPlayer(0);			// エネミーのポインターを初期化
-	ENEMY  *enemy  = GetEnemy(0);				// エネミーのポインターを初期化
+	ENEMY  *enemy  = GetEnemy(0);			// エネミーのポインターを初期化
 	BULLET *bullet = GetBullet(0);			// バレットのポインターを初期化
+	ITEM	*item = GetItem();				// アイテムのポインターを初期化
 
-	D3DXVECTOR3 player_center, enemy_center, bullet_center;
+	D3DXVECTOR3 player_center, enemy_center, bullet_center, item_center;
 	D3DXVECTOR2 player_size = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X/2, TEXTURE_PLAYER_SIZE_Y/2);
 	D3DXVECTOR2 enemy_size =  D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
 	D3DXVECTOR2 bullet_size = D3DXVECTOR2(TEXTURE_BULLET_SIZE_X, TEXTURE_BULLET_SIZE_Y);
+	D3DXVECTOR2 item_size = D3DXVECTOR2(item->sizeX, item->sizeY);
 
 	player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
+
+	// アイテムと操作キャラ(BB)
+	item_center = item->pos + D3DXVECTOR3(item->sizeX / 2, item->sizeY / 2, 0.0f);
+	if (CheckHitBB(player_center, item_center, player_size, item_size) &&
+		player->pos.z == item->pos.z)
+	{
+		item->use = FALSE;
+		/* 無敵状態になる処理をかく */
+	}
+
+
 	// 敵と操作キャラ(BB)
 	for (int i = 0; i < ENEMY_MAX; i++, enemy++)
 	{
