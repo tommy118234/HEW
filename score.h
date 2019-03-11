@@ -37,6 +37,7 @@ struct GAMESCORE {
 	D3DXVECTOR3					pos;						// 座標
 	D3DXVECTOR3					rot;						// 回転
 	int							value;						// スコア値
+	BOOL						use;						// 使用、未使用			
 };
 
 
@@ -53,7 +54,11 @@ void UpdateScore(void);
 void DrawScore(void);
 // スコアを加算
 void AddScore(int addValue);
-
-
+// 頂点座標の設定
+void SetVertexScore(DIGIT *digit);
+// スコアを取得
+GAMESCORE *GetScore(void);
+// 桁の座標を設定
+void PlaceDigit(GAMESCORE *score);
 
 #endif

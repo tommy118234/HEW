@@ -441,7 +441,7 @@ void Draw(void)
 
 		case GAME:
 			DrawBg();					// BGの描画
-			DrawRoad();					// 道の描画
+			//DrawRoad();					// 道の描画
 			player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
 			PrintDebugProc(1, "P : %f\n", player_center.y);
 			for (i = 0; i < ENEMY_MAX; i++ ,enemy++)
@@ -480,7 +480,10 @@ void Draw(void)
 			break;
 
 		case RESULT:
+			DrawBg();					// BGの描画
+			DrawPlayer();				// プレイヤーの描画
 			DrawResult();				// リザルトの描画
+			DrawScore();				// スコアの描画
 			break;
 
 		case EXIT:
@@ -488,7 +491,7 @@ void Draw(void)
 		}
 
 #ifdef _DEBUG
-		DrawDebugProc();		// デバッグ表示の描画
+		DrawDebugProc();				// デバッグ表示の描画
 #endif
 
 		//  direct3D による描画の終了
@@ -601,6 +604,7 @@ void CheckHit(void)
 			player->pos.z == enemy->pos.z)
 		{
 			enemy->use = false;
+
 			player->status.HP --;
 			if (player->status.HP == 0)
 			{

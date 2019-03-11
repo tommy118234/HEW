@@ -31,7 +31,6 @@
 // プロトタイプ宣言
 //*****************************************************************************
 HRESULT MakeVertexScore(DIGIT *digit);					// 頂点の作成
-void SetVertexScore(DIGIT *digit);						// 頂点座標の設定
 void SetColorScore(DIGIT *digit);						// 頂点カラーの設定
 void SetTextureScore(DIGIT *digit, int cntPattern);		// テクスチャ座標の設定
 
@@ -106,7 +105,6 @@ void UpdateScore(void)
 		//テクスチャ座標の設定
 		SetTextureScore(&score.digit[i], score.digit[i].number);
 	}
-
 }
 
 
@@ -203,4 +201,29 @@ void SetTextureScore(DIGIT *digit, int cntPattern)
 void AddScore(int addValue)
 {
 	score.value += addValue;
+}
+
+
+//=============================================================================
+// スコアを取得
+//=============================================================================
+GAMESCORE *GetScore(void)
+{
+	return &score;
+}
+
+
+//=============================================================================
+// 桁の座標を設定
+//=============================================================================
+void PlaceDigit(GAMESCORE *score)
+{
+	for (int i = 0; i < SCORE_DIGIT_MAX; i++)
+	{
+		score->digit[i].number = 0;
+		// 右から並べている
+		score->digit[i].pos.x = score->pos.x - i * DIGIT_WIDTH;
+		score->digit[i].pos.y = score->pos.y = score->pos.y;
+		MakeVertexScore(&score->digit[i]);
+	}
 }

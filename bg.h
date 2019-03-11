@@ -42,6 +42,9 @@ void UninitBg(void);
 void UpdateBg(void);
 // 背景の描画処理
 void DrawBg(void);
-
+// BGの取得
+GAMEBG *GetBg(void);
+// 頂点カラーの設定
+void SetColorBg(GAMEBG *bg, D3DCOLOR setCol);	// 頂点カラーの設定
 
 #endif
