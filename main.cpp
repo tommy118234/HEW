@@ -470,7 +470,7 @@ void Draw(void)
 				i++;
 				enemy++;
 			}
-			DrawBullet();
+			//DrawBullet();
 			// UI
 			DrawTimer();				// タイマーの描画
 			DrawScore();				// スコアの描画
@@ -623,7 +623,8 @@ void CheckHit(void)
 		{
 			if (bullet->use == false) continue;
 			bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2, 0);
-			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size))
+			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size) &&
+				player->pos.z == enemy->pos.z)
 			{
 				//敵HP減少アニメ
 				if (enemy->type == 1)

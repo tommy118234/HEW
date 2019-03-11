@@ -212,7 +212,7 @@ void SetEnemy(void)
 			enemy->use = true;				// 使用状態へ変更する
 			enemy->pos.z = (rand() % ENEMY_MAX);
 			enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
-									 SCREEN_HEIGHT * 0.85f + enemy->pos.z*(SCREEN_HEIGHT*0.05f) - TEXTURE_ENEMY_SIZE_Y,
+									 SCREEN_HEIGHT * 0.85f - TEXTURE_ENEMY_SIZE_Y + enemy->pos.z*(SCREEN_HEIGHT*0.05f),
 									 enemy->pos.z);	// 座標をセット
 			enemy->patternAnim = 0;
 			enemy->speed = 1.0f;

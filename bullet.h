@@ -16,7 +16,7 @@
 #define ANIM_PATTERN_NUM_BULLET			(TEXTURE_PATTERN_DIVIDE_X_BULLET*TEXTURE_PATTERN_DIVIDE_Y_BULLET)	// アニメーションパターン数
 #define TIME_ANIMATION_BULLET			(50)		// アニメーションの切り替わるカウント
 #define BULLET_MAX						(1)		// バレットの最大数
-#define BULLET_SPEED					(30.0f)		// バレットの移動スピード
+#define BULLET_SPEED					(10.0f)		// バレットの移動スピード
 /*******************************************************************************
 * 構造体定義
 ********************************************************************************/
