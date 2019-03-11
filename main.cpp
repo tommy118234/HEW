@@ -11,7 +11,7 @@
 #include "main.h"
 #include "input.h"
 #include "sound.h"
-#include <stdio.h>
+#include <stdio.h> 
 #include "font.h"
 #include "debugproc.h"
 #include "player.h"
@@ -47,7 +47,7 @@ void CheckHit(void);
 //*****************************************************************************
 // グローバル変数:
 //*****************************************************************************
-LPDIRECT3D9			Direct3D = NULL;		// Direct3D オブジェクト
+LPDIRECT3D9			direct3D  = NULL;		// direct3D  オブジェクト
 LPDIRECT3DDEVICE9	pD3DDevice = NULL;		// Deviceオブジェクト(描画に必要)
 STAGE				stage;					// 現在のステージ
 DWORD				currentTime;			// 現在のシステム時刻
@@ -213,15 +213,15 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	D3DPRESENT_PARAMETERS d3dpp;
     D3DDISPLAYMODE d3ddm;
 
-	// Direct3Dオブジェクトの作成
-	Direct3D = Direct3DCreate9(D3D_SDK_VERSION);
-	if(Direct3D == NULL)
+	//  direct3D オブジェクトの作成
+	 direct3D  =  Direct3DCreate9(D3D_SDK_VERSION);
+	if(direct3D  == NULL)
 	{
 		return E_FAIL;
 	}
 
 	// 現在のディスプレイモードを取得
-    if(FAILED(Direct3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm)))
+    if(FAILED( direct3D ->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm)))
 	{
 		return E_FAIL;
 	}
@@ -249,7 +249,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	// デバイスオブジェクトの生成
 	// [デバイス作成制御]<描画>と<頂点処理>をハードウェアで行なう
-	if(FAILED(Direct3D->CreateDevice(D3DADAPTER_DEFAULT,
+	if(FAILED(direct3D->CreateDevice(D3DADAPTER_DEFAULT,
 									D3DDEVTYPE_HAL, 
 									hWnd, 
 									D3DCREATE_HARDWARE_VERTEXPROCESSING, 
@@ -257,7 +257,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	{
 		// 上記の設定が失敗したら
 		// [デバイス作成制御]<描画>をハードウェアで行い、<頂点処理>はCPUで行なう
-		if(FAILED(Direct3D->CreateDevice(D3DADAPTER_DEFAULT,
+		if(FAILED(direct3D->CreateDevice(D3DADAPTER_DEFAULT,
 										D3DDEVTYPE_HAL, 
 										hWnd, 
 										D3DCREATE_SOFTWARE_VERTEXPROCESSING, 
@@ -265,7 +265,7 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		{
 			// 上記の設定が失敗したら
 			// [デバイス作成制御]<描画>と<頂点処理>をCPUで行なう
-			if(FAILED(Direct3D->CreateDevice(D3DADAPTER_DEFAULT,
+			if(FAILED(direct3D->CreateDevice(D3DADAPTER_DEFAULT,
 											D3DDEVTYPE_REF,
 											hWnd, 
 											D3DCREATE_SOFTWARE_VERTEXPROCESSING, 
@@ -335,8 +335,6 @@ void Uninit(void)
 #ifdef _DEBUG
 	UninitDebugProc();			// デバッグ表示の終了
 #endif
-
-
 	//UninitTitle();			// タイトルの終了処理
 	UninitInput();				// 入力処理の終了処理
 	UninitSound();				// サウンドの終了処理
@@ -356,8 +354,8 @@ void Uninit(void)
 	// デバイスの開放
 	SAFE_RELEASE(pD3DDevice);
 
-	// Direct3Dオブジェクトの開放
-	SAFE_RELEASE(Direct3D);
+	//  direct3D オブジェクトの開放
+	SAFE_RELEASE(direct3D);
 
 }
 
@@ -392,7 +390,7 @@ void Update(void)
 		UpdateTimer();				// タイマーの更新
 		UpdateScore();				// スコアの更新
 		UpdateLife();				// ライフの更新
-		CheckHit();
+		CheckHit();					// 当たり判定
 		break;
 
 	case PAUSE:
@@ -420,13 +418,12 @@ void Draw(void)
 {
 	// バックバッファのクリア
 	pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
-
 	PLAYER *player = GetPlayer(0);
 	ENEMY  *enemy = GetEnemy(0);
 	BULLET  *bullet = GetBullet(0);
 	int i;
 	D3DXVECTOR3 player_center, enemy_center;
-	// Direct3Dによる描画の開始
+	//  direct3D による描画の開始
 	if(SUCCEEDED(pD3DDevice->BeginScene()))
 	{
 		switch (stage)
@@ -447,7 +444,7 @@ void Draw(void)
 			DrawRoad();					// 道の描画
 			player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
 			PrintDebugProc(1, "P : %f\n", player_center.y);
-			for (i = 0; i < ENEMY_MAX; i++,enemy++)
+			for (i = 0; i < ENEMY_MAX; i++ ,enemy++)
 			{
 				if (enemy->use == true) 
 				{
@@ -466,7 +463,7 @@ void Draw(void)
 			}
 			if (i == ENEMY_MAX)
 				DrawPlayer();
-			while (i <  ENEMY_MAX)
+			while (i < ENEMY_MAX)
 			{
 				DrawEnemy(i);
 				i++;
@@ -494,13 +491,12 @@ void Draw(void)
 		DrawDebugProc();		// デバッグ表示の描画
 #endif
 
-		// Direct3Dによる描画の終了
+		//  direct3D による描画の終了
 		pD3DDevice->EndScene();
 	}
 
 	// バックバッファとフロントバッファの入れ替え
 	pD3DDevice->Present(NULL, NULL, NULL, NULL);
-//PrintDebugProc(1, "%f %f \n %f %f \n", player_center.x, player_center.y, enemy_center.x, enemy_center.y);
 }
 
 
@@ -587,12 +583,12 @@ bool CheckHitBC(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, float radius1, float radius2
 void CheckHit(void)
 {
 	PLAYER *player = GetPlayer(0);			// エネミーのポインターを初期化
-	ENEMY *enemy = GetEnemy(0);				// エネミーのポインターを初期化
+	ENEMY  *enemy  = GetEnemy(0);				// エネミーのポインターを初期化
 	BULLET *bullet = GetBullet(0);			// バレットのポインターを初期化
 
 	D3DXVECTOR3 player_center, enemy_center, bullet_center;
 	D3DXVECTOR2 player_size = D3DXVECTOR2(TEXTURE_PLAYER_SIZE_X/2, TEXTURE_PLAYER_SIZE_Y/2);
-	D3DXVECTOR2 enemy_size = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
+	D3DXVECTOR2 enemy_size =  D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
 	D3DXVECTOR2 bullet_size = D3DXVECTOR2(TEXTURE_BULLET_SIZE_X, TEXTURE_BULLET_SIZE_Y);
 
 	player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
@@ -605,7 +601,7 @@ void CheckHit(void)
 			player->pos.z == enemy->pos.z)
 		{
 			enemy->use = false;
-			//player->status.HP --;
+			player->status.HP --;
 			if (player->status.HP == 0)
 			{
 				StopAllSound(INIT_SOUND);	// 音を全て止める

@@ -1,42 +1,37 @@
 /*******************************************************************************
-* タイトル:		DirectXゲーム～はじめての個人作品～
-* プログラム名:	バレット処理 [bullet.cpp]
-* 作成者:		GP11B 16　徐　ワイ延
-* 作成開始日:	2018/07/24
+//
+// バレット(攻撃)処理 [bullet.cpp]
+// Author : HAL東京 2年制ゲーム学科 GP11B341 16 徐　ワイ延
+//
 ********************************************************************************/
 #include "main.h"
 #include "player.h"
 #include "bullet.h"
 #include "sound.h"
 #include "input.h"
-
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
 HRESULT MakeVertexBullet(int no);
-void SetTextureBullet(int no, int cntPattern);
-void SetVertexBullet(int no);
-
+void	SetTextureBullet(int no, int cntPattern);
+void	SetVertexBullet (int no);
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		g_pD3DTextureBullet = NULL;		// テクスチャへのポリゴン
+LPDIRECT3DTEXTURE9		bullet_texture = NULL;			// テクスチャへのポリゴン
 BULLET					bulletWk[BULLET_MAX];			// バレット構造体
 LPDIRECTSOUNDBUFFER8	g_pSE;							// SE用バッファ
-
-
 //=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT InitBullet(int type)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	BULLET *bullet = &bulletWk[0];		// エネミーのポインターを初期化
-	PLAYER *player = GetPlayer(0);
+	BULLET *bullet = &bulletWk[0];		// バレットのポインターを初期化
+	PLAYER *player = GetPlayer(0);		// プレイヤーのポインターを初期化
 	for (int i = 0; i < BULLET_MAX; i++, bullet++)
 	{
 		// テクスチャーの初期化を行う？
@@ -48,8 +43,7 @@ HRESULT InitBullet(int type)
 				&bullet->texture);						// 読み込むメモリのポインタ			
 		}
 		bullet->use = false;									// 未使用（発射されていない弾）
-		bullet->pos = D3DXVECTOR3(-600.0f, -600.0f, 0.0f);			// 座標データを初期化
-		bullet->atk = 0;										// ATKを初期化
+		bullet->pos = D3DXVECTOR3(-600.0f, -600.0f, 0.0f);		// 座標データを初期化		
 		D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2);
 		bullet->radius = D3DXVec2Length(&temp);
 		MakeVertexBullet(i);									// 頂点情報の作成
@@ -61,16 +55,8 @@ HRESULT InitBullet(int type)
 //=============================================================================
 void UninitBullet(void)
 {
-	if (g_pD3DTextureBullet != NULL)
-	{	// テクスチャの開放
-		g_pD3DTextureBullet->Release();
-		g_pD3DTextureBullet = NULL;
-	}	
-	if (g_pSE != NULL)
-	{	// テクスチャの開放
-		g_pSE->Release();
-		g_pSE = NULL;
-	}
+	SAFE_RELEASE(bullet_texture);
+	SAFE_RELEASE(g_pSE);
 }
 //=============================================================================
 // 更新処理
@@ -79,13 +65,11 @@ void UpdateBullet(void)
 {
 	BULLET *bullet = &bulletWk[0];			// バレットのポインターを初期化
 	PLAYER *player = GetPlayer(0);			// バレットのポインターを初期化
-
 	for (int i = 0; i < BULLET_MAX; i++, bullet++)
 	{		
 		if (bullet->use == true)			
 		{
 			// バレットの移動処理
-			//bullet->pos.x += bullet->direction*BULLET_SPEED;
 			if (GetKeyboardPress(DIK_LEFT) || IsButtonPressed(0, BUTTON_LEFT))
 			{
 				bullet->pos.x -= player->speed;
@@ -94,8 +78,7 @@ void UpdateBullet(void)
 			{
 				bullet->pos.x += player->speed;
 			}
-			bullet->pos.y -= BULLET_SPEED;
-			//bullet->pos.y -= BULLET_SPEED;			
+			bullet->pos.y -= BULLET_SPEED;		
 			// 画面外まで進んだ？
 			if (bullet->pos.y < player->pos.y || bullet->pos.y > SCREEN_HEIGHT
 				|| bullet->pos.x < -TEXTURE_BULLET_SIZE_X || bullet->pos.x > SCREEN_WIDTH)
@@ -114,10 +97,8 @@ void DrawBullet(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	BULLET *bullet = bulletWk;				// バレットのポインターを初期化
-
 	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
-	
+	pDevice->SetFVF(FVF_VERTEX_2D);	
 	for (int i = 0; i < BULLET_MAX; i++, bullet++)
 	{		
 		if (bullet->use)					// 使用している状態なら更新する
@@ -144,9 +125,9 @@ HRESULT MakeVertexBullet(int no)
 	bullet->vertexWk[2].rhw =
 	bullet->vertexWk[3].rhw = 1.0f;
 	// 反射光の設定
-	bullet->vertexWk[0].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	bullet->vertexWk[1].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
-	bullet->vertexWk[2].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	bullet->vertexWk[0].diffuse = 
+	bullet->vertexWk[1].diffuse = 
+	bullet->vertexWk[2].diffuse = 
 	bullet->vertexWk[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);	
 	// テクスチャ座標の設定
 	bullet->vertexWk[0].tex = D3DXVECTOR2(0.0f, 0.0f);

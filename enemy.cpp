@@ -1,7 +1,7 @@
 //=============================================================================
 //
-// プレーヤー処理 [enemy.cpp]
-// Author : 徐　ワイ延
+// エネミー処理 [enemy.cpp]
+// Author : HAL東京 2年制ゲーム学科 GP11B341 16 徐　ワイ延
 //
 //=============================================================================
 #include "enemy.h"
@@ -9,7 +9,6 @@
 #include "bullet.h"
 #include "debugproc.h"
 #include "math.h"
-
 #include "time.h"
 //*****************************************************************************
 // マクロ定義
@@ -24,9 +23,9 @@ void	 SetEnemy(void);
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-ENEMY	 enemy[ENEMY_MAX];
-LPDIRECT3DTEXTURE9 enemyTexture[2];//二つのENEMY
-int		 enemy_count,enemy_rate;
+ENEMY			   enemy[ENEMY_MAX];			// エネミー構造体
+LPDIRECT3DTEXTURE9 enemyTexture[2];				// 二種類のエネミー
+int				   enemy_count,enemy_rate;		// エネミーの出現頻度
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -34,7 +33,7 @@ HRESULT InitEnemy(int type)
 {
 	srand(time(NULL));
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	ENEMY *enemy = GetEnemy(0);	// プレイヤー０番のアドレスを取得する	
+	ENEMY *enemy = GetEnemy(0);		// エネミーのポインターを初期化	
 	// テクスチャーの初期化を行う？
 	if (type == 0)
 	{
@@ -49,7 +48,7 @@ HRESULT InitEnemy(int type)
 	}
 	for (int i = 0; i < ENEMY_MAX; i++,enemy++) 
 	{
-		// プレイヤーの初期化処理	   
+		// エネミーの初期化処理	   
 		enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
 								 SCREEN_CENTER_Y/4 + rand() % SCREEN_CENTER_Y,
 								 0.0f);
@@ -62,9 +61,8 @@ HRESULT InitEnemy(int type)
 		D3DXVECTOR2 temp = D3DXVECTOR2(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y);
 		enemy->radius = D3DXVec2Length(&temp);
 		enemy->baseAngle = atan2f(TEXTURE_ENEMY_SIZE_Y, TEXTURE_ENEMY_SIZE_X);	// プレイヤーの角度を初期化
-		enemy->type = rand()%2;
-		// 頂点情報の作成
-		MakeVertexEnemy(i);
+		enemy->type = rand()%2;		
+		MakeVertexEnemy(i);			// 頂点情報の作成
 	}
 	enemy_count = 0;
 	enemy_rate = 300;
@@ -93,20 +91,13 @@ void UpdateEnemy(void)
 		if (enemy->use == true)
 		{
 			enemy->countAnim += enemy->speed * 0.3f;
-			//enemy->moving_cooldown = 1;
-			////enemy->countAnim ++;
-			//if (enemy->moving_cooldown > 0)
-			//{
-				enemy->patternAnim = (int)(enemy->countAnim) % ANIM_PATTERN_NUM;
-				// テクスチャ座標を設定
-				SetTextureEnemy(i, enemy->patternAnim);			
-			//}
-			enemy->pos.x += enemy->direction*enemy->speed * 3.0f;
+			enemy->patternAnim = (int)(enemy->countAnim) % ANIM_PATTERN_NUM;
+			// テクスチャ座標を設定
+			SetTextureEnemy(i, enemy->patternAnim);	
 			//// 移動後の座標で頂点を設定
-
+			enemy->pos.x += enemy->direction*enemy->speed * 3.0f;
 			if (enemy->pos.x < 0 || enemy->pos.x > SCREEN_WIDTH)
 				enemy->use = false;
-
 			SetVertexEnemy(i);
 		}
 		else
@@ -129,16 +120,15 @@ void DrawEnemy(int pno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	ENEMY *enemy = GetEnemy(pno);
-	//for (int i = 0; i < ENEMY_MAX; i++, enemy++)
-	//{
-		if (enemy->use == true)					// 使用している状態なら更新する
-		{
-			// テクスチャの設定
-			pDevice->SetTexture(0, enemyTexture[enemy->type]);
-			// ポリゴンの描画
-			pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_BULLET, enemy->vtx, sizeof(VERTEX_2D));
-		}
-	//}
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_2D);
+	if (enemy->use)					// 使用している状態なら更新する
+	{
+		// テクスチャの設定
+		pDevice->SetTexture(0, enemyTexture[enemy->type]);
+		// ポリゴンの描画
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_BULLET, enemy->vtx, sizeof(VERTEX_2D));
+	}
 }
 
 //=============================================================================
@@ -148,7 +138,6 @@ HRESULT MakeVertexEnemy(int no)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 	ENEMY *enemy = GetEnemy(no);
-
 	// 頂点座標の設定
 	SetVertexEnemy(no);
 	// rhwの設定
@@ -189,7 +178,6 @@ void SetVertexEnemy(int no)
 void SetTextureEnemy(int no, int cntPattern)
 {
 	ENEMY *enemy = GetEnemy(no);
-
 	// テクスチャ座標の設定
 	int x = cntPattern % TEXTURE_PATTERN_DIVIDE_X;
 	int y = cntPattern / TEXTURE_PATTERN_DIVIDE_X;
