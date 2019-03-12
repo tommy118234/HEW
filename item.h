@@ -17,6 +17,12 @@
 //*****************************************************************************
 // マクロ・列挙型定義
 //*****************************************************************************
+// アイテムの数
+#define ITEM_MAX				(1)
+
+// アイテムのサイズ
+#define ITEM_SIZE_X				(60)
+#define ITEM_SIZE_Y				(77)	
 
 
 //*****************************************************************************
@@ -46,10 +52,10 @@ void UninitItem(void);
 // アイテムの更新処理
 void UpdateItem(void);
 // アイテムの描画処理
-void DrawItem(void);
+void DrawItem(int itemNo);
 // ITEMの取得
 ITEM *GetItem(void);
 // 頂点カラーの設定
-void SetColorItem(ITEM *item, D3DCOLOR setCol);	// 頂点カラーの設定
+void SetColorItem(ITEM *item, D3DCOLOR setCol);
 
 #endif

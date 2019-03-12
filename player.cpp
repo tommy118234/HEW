@@ -193,10 +193,10 @@ void UpdatePlayer(void)
 //=============================================================================
 // 描画処理
 //=============================================================================
-void DrawPlayer(void)
+void DrawPlayer(int pno)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	PLAYER *player = GetPlayer(0);
+	PLAYER *player = GetPlayer(pno);
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 	// テクスチャの設定

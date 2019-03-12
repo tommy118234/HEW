@@ -34,6 +34,7 @@
 //*****************************************************************************
 #define CLASS_NAME		"Team Adult Game"	// ウインドウのクラス名
 #define WINDOW_NAME		"Team Adult Game"	// ウインドウのキャプション名
+#define OBJECT_MAX		(PLAYER_MAX + ENEMY_MAX + ITEM_MAX)
 
 
 //*****************************************************************************
@@ -45,6 +46,9 @@ void Uninit(void);
 void Update(void);
 void Draw(void);
 void CheckHit(void);
+void SortDraw(int num);
+
+
 
 //*****************************************************************************
 // グローバル変数:
@@ -58,6 +62,8 @@ GAMEDATA			gameData;				// ゲーム進行データセット
 int					cntFPS;					// FPSカウンタ
 #endif
 int					player_cnt;
+SORTOBJECT			sortArray[OBJECT_MAX];	// 描画ソート用構造体配列
+
 
 //=============================================================================
 // メイン関数
@@ -320,6 +326,26 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	// gameData初期化
 	gameData.isGameClear = FALSE;
+	gameData.isCombo = FALSE;
+	gameData.numCombo = 0;
+	
+	// 描画ソート用構造体配列の初期化
+	sortArray[0].drawFunc = DrawPlayer;
+	sortArray[0].objectNo = 0;
+	sortArray[0].pos = &GetPlayer(0)->pos;
+	sortArray[0].adjustCenterY = TEXTURE_PLAYER_SIZE_Y / 2;
+	for (int i = 0; i < ENEMY_MAX; i++)
+	{
+		sortArray[1 + i].drawFunc = DrawEnemy;
+		sortArray[1 + i].objectNo = i;
+		sortArray[1 + i].pos = &GetEnemy(0)->pos;
+		sortArray[1 + i].adjustCenterY = TEXTURE_ENEMY_SIZE_Y / 2;
+	}
+	sortArray[5].drawFunc = DrawItem;
+	sortArray[5].objectNo = 0;
+	sortArray[5].pos = &GetItem()->pos;
+	sortArray[5].adjustCenterY = ITEM_SIZE_Y / 2;
+
 
 	// 音量調節
 	//GetSound(BGM_BATTLE_1)->SetVolume(-200);
@@ -456,35 +482,44 @@ void Draw(void)
 			DrawBg();					// BGの描画
 			DrawRoad();					// 道の描画
 
-			DrawItem();					// アイテムの描画　描画順のソートが未着手
+			// プレイヤー, エネミー, アイテムをY座標でソートして描画
+			SortDraw(OBJECT_MAX);
+			for (int i = 0; i < OBJECT_MAX; i++)
+			{
+				(*sortArray[i].drawFunc)(sortArray[i].objectNo);
+			}
 
-			player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
-			PrintDebugProc(1, "P : %f\n", player_center.y);
-			for (i = 0; i < ENEMY_MAX; i++ ,enemy++)
-			{
-				if (enemy->use == true) 
-				{
-					enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
-					PrintDebugProc(1, "%d  %f\n",i+1, enemy_center.y);
-					if (player->pos.y > enemy->pos.y)
-					{
-						DrawEnemy(i);	 // ENEMYの描画	
-					}
-					else
-					{
-						DrawPlayer();
-						break;
-					}
-				}
-			}
-			if (i == ENEMY_MAX)
-				DrawPlayer();
-			while (i < ENEMY_MAX)
-			{
-				DrawEnemy(i);
-				i++;
-				enemy++;
-			}
+			PrintDebugProc(2, "num : %d\n", gameData.numCombo);
+			PrintDebugProc(2, "score : %d\n", GetScore()->value);
+
+
+			//player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
+			//PrintDebugProc(1, "P : %f\n", player_center.y);
+			//for (i = 0; i < ENEMY_MAX; i++ ,enemy++)
+			//{
+			//	if (enemy->use == true) 
+			//	{
+			//		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
+			//		PrintDebugProc(1, "%d  %f\n",i+1, enemy_center.y);
+			//		if (player->pos.y > enemy->pos.y)
+			//		{
+			//			DrawEnemy(i);	 // ENEMYの描画	
+			//		}
+			//		else
+			//		{
+			//			DrawPlayer();
+			//			break;
+			//		}
+			//	}
+			//}
+			//if (i == ENEMY_MAX)
+			//	DrawPlayer();
+			//while (i < ENEMY_MAX)
+			//{
+			//	DrawEnemy(i);
+			//	i++;
+			//	enemy++;
+			//}
 			//DrawBullet();
 
 
@@ -500,7 +535,7 @@ void Draw(void)
 
 		case RESULT:
 			DrawBg();					// BGの描画
-			DrawPlayer();				// プレイヤーの描画
+			DrawPlayer(0);				// プレイヤーの描画
 			DrawResult();				// リザルトの描画
 			DrawScore();				// スコアの描画
 			break;
@@ -636,7 +671,12 @@ void CheckHit(void)
 			player->pos.z == enemy->pos.z)
 		{
 			enemy->use = false;
+
+			/* 無敵だったらHP減らずにコンボも継続 */
+
 			player->status.HP --;
+			gameData.isCombo = FALSE;		// コンボ終了
+			gameData.numCombo = 0;			// コンボリセット
 			if (player->status.HP == 0)
 			{
 				StopAllSound(INIT_SOUND);	// 音を全て止める
@@ -644,6 +684,7 @@ void CheckHit(void)
 			}
 		}
 	}
+
 	// ボスと弾(BC) // bullet(heavy) inner loop, enemy(light) outer loop
 	enemy = GetEnemy(0);					// エネミーのポインターを初期化
 	for (int j = 0; j < ENEMY_MAX; j++, enemy++)
@@ -657,16 +698,54 @@ void CheckHit(void)
 			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size) &&
 				player->pos.z == enemy->pos.z)
 			{
-				//敵HP減少アニメ
 				if (enemy->type == 1)
+				{// エネミー
 					enemy->use = false;
-				else
-					enemy->direction = 1;
+					gameData.isCombo = FALSE;		// コンボ終了
+					gameData.numCombo = 0;			// コンボリセット
 
+					/* 無敵だったらここでもスコア加算 */
+				}
+				else
+				{// ターゲット
+					gameData.isCombo = TRUE;		// コンボ開始
+					gameData.numCombo++;
+					AddScore(100);					// ●あたったフレーム数分スコアが入ってしまっている？
+					enemy->direction = 1;
+				}
 			}
 		}
 	}
 }
+
+
+//=============================================================================
+// 描画ソート関数
+// [説明]	: 描画順を入れ替える
+// [戻り値]	: void
+// [引数]	: int型 入れ替えるオブジェクトの数
+//-----------------------------------------------------------------------------
+// [補足]	: オブジェクトのY座標でバブルソートを行う
+//=============================================================================
+void SortDraw(int num)
+{
+	int i, j;
+	SORTOBJECT temp;
+
+	for (i = 0; i < (num - 1); i++)
+	{
+		for (j = (num - 1); j > i; j--)
+		{
+			if (sortArray[j - 1].pos->y + sortArray[j - 1].adjustCenterY > sortArray[j].pos->y + sortArray[j].adjustCenterY)
+			{
+				temp = sortArray[j - 1];
+				sortArray[j - 1] = sortArray[j];
+				sortArray[j] = temp;
+			}
+		}
+	}
+}
+
 
 #ifdef _DEBUG
 //=============================================================================

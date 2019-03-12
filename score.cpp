@@ -23,7 +23,7 @@
 #define DIGIT_HEIGHT				(50)	
 
 // スコア座標
-#define SCORE_POS_X					(950)		// 1桁目（右端）の桁の座標となる
+#define SCORE_POS_X					(950)				// 1桁目（右端）の桁の座標となる
 #define SCORE_POS_Y					(50.0f)
 
 
@@ -200,7 +200,18 @@ void SetTextureScore(DIGIT *digit, int cntPattern)
 //=============================================================================
 void AddScore(int addValue)
 {
-	score.value += addValue;
+	GAMEDATA *gameData = GetGameData();
+
+	if (gameData->isCombo)
+	{
+		// コンボ中の得点
+		score.value += addValue + gameData->numCombo * addValue;
+	}
+	else
+	{
+		// 通常得点
+		score.value += addValue;
+	}
 }
 
 

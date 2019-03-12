@@ -137,7 +137,9 @@ void UpdateResult(void)
 	if (IsButtonTriggered(0, BUTTON_A) || GetKeyboardTrigger(DIK_RETURN) || GetKeyboardTrigger(DIK_SPACE))
 	{
 		StopAllSound(INIT_SOUND);
-		GetGameData()->isGameClear = FALSE;
+		gameData->isGameClear = FALSE;
+		gameData->isCombo = FALSE;
+		gameData->numCombo = 0;
 		InitPlayer(REINIT);
 		InitEnemy(REINIT);
 		InitBg(REINIT);
