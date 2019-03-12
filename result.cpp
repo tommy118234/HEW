@@ -13,6 +13,7 @@
 #include "road.h"
 #include "timer.h"
 #include "score.h"
+#include "life.h"
 #include "result.h"
 
 
@@ -95,6 +96,7 @@ void UninitResult(void)
 void UpdateResult(void)
 {
 	GAMEDATA *gameData = GetGameData();
+	gameData->isGameClear = TRUE;
 
 	// サウンド
 	if (isSoundPlay)
@@ -141,6 +143,9 @@ void UpdateResult(void)
 		InitBg(REINIT);
 		InitRoad(REINIT);
 		InitTimer(REINIT);
+		InitScore(REINIT);
+		InitLife(REINIT);
+		InitResult(REINIT);
 		SetStage(TITLE);
 	}
 }
