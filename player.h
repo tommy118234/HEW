@@ -24,7 +24,7 @@
 
 // スクロール開始座標
 #define LEFT_SCROLL_LINE_X	(SCREEN_WIDTH * 0.05f)
-#define RIGHT_SCROLL_LINE_X	(SCREEN_WIDTH * 0.5f)
+#define RIGHT_SCROLL_LINE_X	(SCREEN_WIDTH * 0.7f)
 
 
 /*******************************************************************************

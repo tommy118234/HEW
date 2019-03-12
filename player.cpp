@@ -55,6 +55,7 @@ HRESULT InitPlayer(int type)
 	player->moving_cooldown = 0;
 	player->speed = 3.0f;
 	player->status.HP = 6;
+	player->status.LUCK = 0;
 	D3DXVECTOR2 temp = D3DXVECTOR2(tEXTURE_PLAYER_SIZE_X, tEXTURE_PLAYER_SIZE_Y);
 	player->radius = D3DXVec2Length(&temp);
 	player->baseAngle = atan2f(tEXTURE_PLAYER_SIZE_Y, tEXTURE_PLAYER_SIZE_X);	// プレイヤーの角度を初期化
@@ -82,6 +83,8 @@ void UpdatePlayer(void)
 	player->speed_boost = 1;
 	if (GetKeyboardPress(DIK_LCONTROL) || GetKeyboardPress(DIK_RCONTROL) || IsButtonPressed(0, BUTTON_Y))
 		player->speed_boost = 2.0f;
+	if (player->status.LUCK >0)
+		player->speed_boost = 3.0f;
 	// アニメーション
 	if (!GetBullet(0)->use)
 		player->countAnim += player->speed * player->speed_boost * 0.1f;
@@ -182,12 +185,18 @@ void UpdatePlayer(void)
 		player->pos.z = 1;
 	}
 
+	if (player->status.LUCK > 0)
+	{
+		player->status.LUCK--;
+	}
 
 	// 移動後の座標で頂点を設定
 	SetVertexPlayer();
 
 	PrintDebugProc(1, "Player_Y:%f\n", player->pos.y);
 	PrintDebugProc(1, "Player_Z:%f\n", player->pos.z);
+
+	PrintDebugProc(1, "Player_LUCK:%d\n", player->status.LUCK);
 }
 
 //=============================================================================
@@ -220,14 +229,14 @@ HRESULT MakeVertexPlayer(void)
 	SetVertexPlayer();
 	// rhwの設定
 	player->vtx[0].rhw =
-		player->vtx[1].rhw =
-		player->vtx[2].rhw =
-		player->vtx[3].rhw = 1.0f;
-	// 反射光の設定
+	player->vtx[1].rhw =
+	player->vtx[2].rhw =
+	player->vtx[3].rhw = 1.0f;
+	// 反射光の設定	
 	player->vtx[0].diffuse =
-		player->vtx[1].diffuse =
-		player->vtx[2].diffuse =
-		player->vtx[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	player->vtx[1].diffuse =
+	player->vtx[2].diffuse =
+	player->vtx[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
 	// テクスチャ座標の設定
 	player->vtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
 	player->vtx[1].tex = D3DXVECTOR2(1.0f / tEXTURE_PATTERN_DIVIDE_X, 0.0f);
@@ -275,6 +284,21 @@ void SetTexturePlayer(int dir, int cntPattern)
 		player->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);
 		player->vtx[2].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY + sizeY);
 		player->vtx[3].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY + sizeY);
+	}
+	// 反射光の設定
+	if (player->status.LUCK == 0)
+	{
+		player->vtx[0].diffuse =
+			player->vtx[1].diffuse =
+			player->vtx[2].diffuse =
+			player->vtx[3].diffuse = D3DCOLOR_RGBA(255, 255, 255, 255);
+	}
+	else
+	{
+		player->vtx[0].diffuse =
+			player->vtx[1].diffuse =
+			player->vtx[2].diffuse =
+			player->vtx[3].diffuse = D3DCOLOR_RGBA(255, 128, 255, 255);
 	}
 }
 /*******************************************************************************

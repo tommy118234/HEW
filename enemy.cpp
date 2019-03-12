@@ -95,7 +95,7 @@ void UpdateEnemy(void)
 			// テクスチャ座標を設定
 			SetTextureEnemy(i, enemy->patternAnim);	
 			//// 移動後の座標で頂点を設定
-			enemy->pos.x += enemy->direction*enemy->speed * 3.0f;
+			enemy->pos.x += enemy->direction*enemy->speed * 1.5f;
 			if (enemy->pos.x < 0 || enemy->pos.x > SCREEN_WIDTH)
 				enemy->use = false;
 			SetVertexEnemy(i);
@@ -214,12 +214,15 @@ void SetEnemy(void)
 			enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
 									 SCREEN_HEIGHT * 0.85f - TEXTURE_ENEMY_SIZE_Y + enemy->pos.z*(SCREEN_HEIGHT*0.05f),
 									 enemy->pos.z);	// 座標をセット
-			enemy->patternAnim = 0;
-			enemy->speed = 1.0f;
+			enemy->patternAnim = 0;			
 			enemy->direction = -1;
 			enemy->type = rand() % 2;
 			enemy_count = 0;
 			enemy_rate = 260+rand()%41;
+			if (enemy->type == 1)
+				enemy->speed = 1.0f;
+			else
+				enemy->speed = 2.0f;
 			return;							// 1発セットしたので終了する
 		}
 	}

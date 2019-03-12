@@ -480,7 +480,7 @@ void Draw(void)
 
 		case GAME:
 			DrawBg();					// BGの描画
-			DrawRoad();					// 道の描画
+			//DrawRoad();					// 道の描画
 
 			// プレイヤー, エネミー, アイテムをY座標でソートして描画
 			SortDraw(OBJECT_MAX);
@@ -659,6 +659,7 @@ void CheckHit(void)
 	{
 		item->use = FALSE;
 		/* 無敵状態になる処理をかく */
+		player->status.LUCK += 5 * 60;
 	}
 
 
@@ -667,20 +668,27 @@ void CheckHit(void)
 	{
 		if (enemy->use == false)	continue;
 		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
-		if (CheckHitBB(player_center, enemy_center, player_size ,enemy_size) &&
-			player->pos.z == enemy->pos.z)
+		if (CheckHitBB(player_center, enemy_center, player_size/2 ,enemy_size) &&
+			player->pos.z == enemy->pos.z &&
+			enemy->direction != player->direction)
 		{
 			enemy->use = false;
 
 			/* 無敵だったらHP減らずにコンボも継続 */
-
-			player->status.HP --;
-			gameData.isCombo = FALSE;		// コンボ終了
-			gameData.numCombo = 0;			// コンボリセット
-			if (player->status.HP == 0)
+			if (player->status.LUCK == 0)
 			{
-				StopAllSound(INIT_SOUND);	// 音を全て止める
-				SetStage(RESULT);			// ステージ遷移
+				player->status.HP--;
+				gameData.isCombo = FALSE;		// コンボ終了
+				gameData.numCombo = 0;			// コンボリセット
+				if (player->status.HP == 0)
+				{
+					StopAllSound(INIT_SOUND);	// 音を全て止める
+					SetStage(RESULT);			// ステージ遷移
+				}
+			}
+			else
+			{
+				AddScore(50);
 			}
 		}
 	}
@@ -696,7 +704,8 @@ void CheckHit(void)
 			if (bullet->use == false) continue;
 			bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2, 0);
 			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size) &&
-				player->pos.z == enemy->pos.z)
+				player->pos.z == enemy->pos.z
+				)
 			{
 				if (enemy->type == 1)
 				{// エネミー
@@ -705,13 +714,24 @@ void CheckHit(void)
 					gameData.numCombo = 0;			// コンボリセット
 
 					/* 無敵だったらここでもスコア加算 */
+					if (player->status.LUCK > 0)
+					{
+						gameData.isCombo = TRUE;		// コンボ開始
+						gameData.numCombo++;
+						AddScore(100);					// ●あたったフレーム数分スコアが入ってしまっている？
+						//enemy->direction = 1;
+						enemy->use = false;
+						AddNumPanty();
+					}
 				}
-				else
+				else if(enemy->direction == player->direction)
 				{// ターゲット
 					gameData.isCombo = TRUE;		// コンボ開始
 					gameData.numCombo++;
 					AddScore(100);					// ●あたったフレーム数分スコアが入ってしまっている？
-					enemy->direction = 1;
+					//enemy->direction = 1;
+					enemy->use = false;
+					AddNumPanty();
 				}
 			}
 		}

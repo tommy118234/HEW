@@ -80,14 +80,14 @@ void UpdateBg(void)
 	{
 		if (GetPlayer(0)->pos.x >= RIGHT_SCROLL_LINE_X)
 		{
-			bg.pos.x -= MOVE_SPEED_X;
+			bg.pos.x -= GetPlayer(0)->speed*GetPlayer(0)->speed_boost;
 		}
 	}
 	else if (IsButtonPressed(0, BUTTON_LEFT) || GetKeyboardPress(DIK_LEFT))
 	{
 		if (GetPlayer(0)->pos.x <= LEFT_SCROLL_LINE_X)
 		{
-			bg.pos.x += MOVE_SPEED_X;
+			bg.pos.x += GetPlayer(0)->speed*GetPlayer(0)->speed_boost;
 		}
 	}
 
