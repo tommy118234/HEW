@@ -16,10 +16,6 @@
 // テクスチャ場所
 #define TEXTURE_ITEM		_T("data/TEXTURE/pop_corn.png")
 
-// アイテムのサイズ
-#define ITEM_SIZE_X			(60)
-#define ITEM_SIZE_Y			(77)	
-
 // アイテムの座標
 #define INIT_POS_X			(100.0f)
 #define MOVE_SPEED_X		(2.0f)
@@ -122,7 +118,7 @@ void UpdateItem(void)
 //=============================================================================
 // 描画処理
 //=============================================================================
-void DrawItem(void)
+void DrawItem(int itemNo)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 

@@ -127,8 +127,18 @@ struct  TRANSFORM
 struct GAMEDATA
 {
 	BOOL			isGameClear;	// ゲームのリザルト// TRUE:GameClear FALSE:GameOver
+	BOOL			isCombo;		// コンボ中か
+	int				numCombo;		// コンボ回数
 };
 
+// SORT_OBJECT構造体を定義
+typedef void(*SORTDRAW)(int no);	// 関数ポインタ型の定義
+typedef struct {
+	D3DXVECTOR3	*pos;				// オブジェクトの座標
+	SORTDRAW	drawFunc;			// 描画関数のポインタ
+	int			objectNo;			// オブジェクトの番号
+	float		adjustCenterY;		// 中心座標への修正
+}SORTOBJECT;
 
 struct CHARACTER 
 {

@@ -49,9 +49,9 @@ struct	PLAYER										// キャラクターの基本構造体
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT InitPlayer(int type);
-void	UninitPlayer(void);
-void	UpdatePlayer(void);
-void	DrawPlayer(void);
-PLAYER  *GetPlayer(int pno);	// プレイヤーの(アドレス)を取得
+HRESULT		InitPlayer(int type);
+void		UninitPlayer(void);
+void		UpdatePlayer(void);
+void		DrawPlayer(int pno);
+PLAYER		*GetPlayer(int pno);	// プレイヤーの(アドレス)を取得
 #endif
