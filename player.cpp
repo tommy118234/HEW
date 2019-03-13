@@ -202,6 +202,8 @@ void UpdatePlayer(void)
 		player->status.LUCK--;
 
 	}
+	//if (player->status.LUCK>600)
+	//	player->status.LUCK=0;
 
 	// 移動後の座標で頂点を設定
 	SetVertexPlayer();

@@ -414,16 +414,16 @@ void Update(void)
 		break;
 
 	case GAME:
-		//if (player->status.LUCK > 0)
-		//{
-		//	PlayGameSound(BGM_MUTEKI, CONTINUE_SOUND, LOOP);
-		//	StopSound(BGM_GAME, CONTINUE_SOUND);
-		//}
-		//else
-		//{
+		if (player->status.LUCK > 0)
+		{
+			PlayGameSound(BGM_MUTEKI, CONTINUE_SOUND, LOOP);
+			StopSound(BGM_GAME, CONTINUE_SOUND);
+		}
+		else
+		{
 			PlayGameSound(BGM_GAME, CONTINUE_SOUND, LOOP);
-		//	StopSound(BGM_MUTEKI, CONTINUE_SOUND);
-		//}
+			StopSound(BGM_MUTEKI, CONTINUE_SOUND);
+		}
 
 		UpdatePlayer();				// プレイヤーの更新
 		UpdateBullet();				// バレットの更新
@@ -642,7 +642,7 @@ void CheckHit(void)
 	{
 		item->use = FALSE;
 		/* 無敵状態になる処理をかく */
-		player->status.LUCK += 5 * 60;
+		player->status.LUCK = 5 * 60;
 	}
 
 
@@ -651,7 +651,7 @@ void CheckHit(void)
 	{
 		if (enemy->use == false)	continue;
 		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
-		if (CheckHitBB(player_center, enemy_center, player_size/2 ,enemy_size) &&
+		if (CheckHitBB(player_center, enemy_center, player_size/4 ,enemy_size) &&
 			player->pos.z == enemy->pos.z &&
 			enemy->direction != player->direction
 			)
@@ -676,8 +676,10 @@ void CheckHit(void)
 				gameData.numCombo++;
 				AddScore(50);			
 				AddNumPanty();
-				if (player->status.LUCK > 100)
-					player->status.LUCK -= 100;
+				if (player->status.LUCK > 200)
+					player->status.LUCK = 200;
+				else if (player->status.LUCK > 100)
+					player->status.LUCK = 100;
 				else
 					player->status.LUCK = 0;
 			}
@@ -713,9 +715,10 @@ void CheckHit(void)
 						//enemy->direction = 1;
 						enemy->use = false;
 						AddNumPanty();
-
-						if (player->status.LUCK > 100)
-							player->status.LUCK -= 100;
+						if (player->status.LUCK > 200)
+							player->status.LUCK = 200;
+						else if (player->status.LUCK > 100)
+							player->status.LUCK = 100;
 						else
 							player->status.LUCK = 0;
 					}
@@ -724,7 +727,7 @@ void CheckHit(void)
 				{// ターゲット
 					gameData.isCombo = TRUE;		// コンボ開始
 					gameData.numCombo++;
-					if (player->status.LUCK > 100)
+					if (player->status.LUCK > 0)
 						AddScore(200);					// ●あたったフレーム数分スコアが入ってしまっている？
 					else
 						AddScore(100);

@@ -225,7 +225,7 @@ void SetEnemy(void)
 			enemy->direction = -1;
 			enemy->type = rand() % 2;
 			enemy_count = 0;
-			enemy_rate = 300;
+			enemy_rate = 400;
 			if (enemy->type == 1)
 				enemy->speed = 1.0f;
 			else
