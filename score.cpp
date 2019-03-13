@@ -229,9 +229,15 @@ GAMESCORE *GetScore(void)
 //=============================================================================
 void PlaceDigit(GAMESCORE *score)
 {
+	// スコア各桁の数字を算出
+	int wk = score->value;
 	for (int i = 0; i < SCORE_DIGIT_MAX; i++)
 	{
 		score->digit[i].number = 0;
+		score->digit[i].number = wk % 10;
+		wk /= 10;
+		//テクスチャ座標の設定
+		SetTextureScore(&score->digit[i], score->digit[i].number);
 		// 右から並べている
 		score->digit[i].pos.x = score->pos.x - i * DIGIT_WIDTH;
 		score->digit[i].pos.y = score->pos.y = score->pos.y;

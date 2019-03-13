@@ -90,7 +90,7 @@ void UpdateEnemy(void)
 	{
 		if (enemy->use == true)
 		{
-			enemy->countAnim += enemy->speed * 0.3f;
+			enemy->countAnim += enemy->speed * 0.2f;
 			enemy->patternAnim = (int)(enemy->countAnim) % ANIM_PATTERN_NUM;
 			// テクスチャ座標を設定
 			SetTextureEnemy(i, enemy->patternAnim);	
@@ -210,7 +210,7 @@ void SetEnemy(void)
 		if (enemy->use == false)			// 未使用状態のバレットを見つける
 		{	
 			enemy->use = true;				// 使用状態へ変更する
-			enemy->pos.z = (rand() % ENEMY_MAX);
+			enemy->pos.z = (1+rand() % (ENEMY_MAX-1));
 			enemy->pos = D3DXVECTOR3(SCREEN_WIDTH - TEXTURE_ENEMY_SIZE_X,
 									 SCREEN_HEIGHT * 0.85f - TEXTURE_ENEMY_SIZE_Y + enemy->pos.z*(SCREEN_HEIGHT*0.05f),
 									 enemy->pos.z);	// 座標をセット
@@ -218,11 +218,11 @@ void SetEnemy(void)
 			enemy->direction = -1;
 			enemy->type = rand() % 2;
 			enemy_count = 0;
-			enemy_rate = 260+rand()%41;
+			enemy_rate = 300;
 			if (enemy->type == 1)
 				enemy->speed = 1.0f;
 			else
-				enemy->speed = 2.0f;
+				enemy->speed = 1.5f;
 			return;							// 1発セットしたので終了する
 		}
 	}

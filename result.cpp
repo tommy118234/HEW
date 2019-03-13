@@ -15,6 +15,7 @@
 #include "score.h"
 #include "life.h"
 #include "result.h"
+#include "debugproc.h"
 
 
 //*****************************************************************************
@@ -150,6 +151,9 @@ void UpdateResult(void)
 		InitResult(REINIT);
 		SetStage(TITLE);
 	}
+
+
+	PrintDebugProc(1, "Score:%d\n", score->value);
 }
 
 

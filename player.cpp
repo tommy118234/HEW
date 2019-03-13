@@ -46,6 +46,10 @@ HRESULT InitPlayer(int type)
 		D3DXCreateTextureFromFile(pDevice,				// デバイスのポインタ
 			TEXTURE_GAME_PLAYER2,	// ファイルの名前
 			&player->texture[1]);
+
+		D3DXCreateTextureFromFile(pDevice,				// デバイスのポインタ
+			TEXTURE_GAME_PLAYER3,	// ファイルの名前
+			&player->texture[2]);
 	}
 	// プレイヤーの初期化処理	   
 	player->pos = D3DXVECTOR3(tEXTURE_PLAYER_SIZE_X / 2, SCREEN_HEIGHT - tEXTURE_PLAYER_SIZE_Y, 0.0f);
@@ -99,15 +103,21 @@ void UpdatePlayer(void)
 			player->moving_cooldown--;
 	}
 	// 入力対応
-	if (GetKeyboardPress(DIK_DOWN) || IsButtonPressed(0, BUTTON_DOWN))
+	if (GetKeyboardTrigger(DIK_DOWN) || IsButtonPressed(0, BUTTON_DOWN))
 	{
 		player->moving_cooldown = 1;
 		player->pos.y += player->speed * player->speed_boost;
+		if (player->pos.z < 3)
+			player->pos.z++;
+
 	}
-	if (GetKeyboardPress(DIK_UP) || IsButtonPressed(0, BUTTON_UP))
+	if (GetKeyboardTrigger(DIK_UP) || IsButtonPressed(0, BUTTON_UP))
 	{
+
 		player->moving_cooldown = 1;
 		player->pos.y -= player->speed * player->speed_boost;
+		if (player->pos.z > 0)
+			player->pos.z--;
 	}
 	if (GetKeyboardPress(DIK_LEFT) || IsButtonPressed(0, BUTTON_LEFT))
 	{
@@ -169,25 +179,28 @@ void UpdatePlayer(void)
 	}
 
 	// Yの座標によって、Z(偽Depth)を変わる
+	player->pos.y = SCREEN_HEIGHT * 0.85f - TEXTURE_PLAYER_SIZE_Y + player->pos.z*(SCREEN_HEIGHT*0.05f);
 
-	player->pos.z = 0;
-	if (player->pos.y > SCREEN_HEIGHT * 0.8f - tEXTURE_PLAYER_SIZE_Y / 2)
-	{
-		player->pos.z = 3;
-	}
-	else if (player->pos.y > SCREEN_HEIGHT * 0.75f - tEXTURE_PLAYER_SIZE_Y / 2)
-	{
-		player->pos.z = 2;
-	}
 
-	else if (player->pos.y > SCREEN_HEIGHT * 0.7f - tEXTURE_PLAYER_SIZE_Y / 2)
-	{
-		player->pos.z = 1;
-	}
+	//player->pos.z = 0;
+	//if (player->pos.y > SCREEN_HEIGHT * 0.8f - tEXTURE_PLAYER_SIZE_Y / 2)
+	//{
+	//	player->pos.z = 3;
+	//}
+	//else if (player->pos.y > SCREEN_HEIGHT * 0.75f - tEXTURE_PLAYER_SIZE_Y / 2)
+	//{
+	//	player->pos.z = 2;
+	//}
+	//
+	//else if (player->pos.y > SCREEN_HEIGHT * 0.7f - tEXTURE_PLAYER_SIZE_Y / 2)
+	//{
+	//	player->pos.z = 1;
+	//}
 
 	if (player->status.LUCK > 0)
 	{
 		player->status.LUCK--;
+
 	}
 
 	// 移動後の座標で頂点を設定
@@ -214,6 +227,9 @@ void DrawPlayer(int pno)
 		pDevice->SetTexture(0, player->texture[1]);
 	else
 		pDevice->SetTexture(0, player->texture[0]);
+
+	if (player->status.LUCK > 0)
+		pDevice->SetTexture(0, player->texture[2]);
 	// ポリゴンの描画
 	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, player->vtx, sizeof(VERTEX_2D));
 }
@@ -298,7 +314,7 @@ void SetTexturePlayer(int dir, int cntPattern)
 		player->vtx[0].diffuse =
 			player->vtx[1].diffuse =
 			player->vtx[2].diffuse =
-			player->vtx[3].diffuse = D3DCOLOR_RGBA(255, 128, 255, 255);
+			player->vtx[3].diffuse = D3DCOLOR_RGBA(255, rand()%256, 255, 255);
 	}
 }
 /*******************************************************************************

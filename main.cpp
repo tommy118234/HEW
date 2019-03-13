@@ -491,8 +491,6 @@ void Draw(void)
 
 			PrintDebugProc(2, "num : %d\n", gameData.numCombo);
 			PrintDebugProc(2, "score : %d\n", GetScore()->value);
-
-
 			//player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
 			//PrintDebugProc(1, "P : %f\n", player_center.y);
 			//for (i = 0; i < ENEMY_MAX; i++ ,enemy++)
@@ -521,8 +519,6 @@ void Draw(void)
 			//	enemy++;
 			//}
 			//DrawBullet();
-
-
 			// UI
 			DrawPanty();				// パンティの描画
 			DrawTimer();				// タイマーの描画
@@ -539,7 +535,6 @@ void Draw(void)
 			DrawResult();				// リザルトの描画
 			DrawScore();				// スコアの描画
 			break;
-
 		case EXIT:
 			break;
 		}
@@ -617,6 +612,11 @@ bool CheckHitBB(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2, D3DXVECTOR2 size1, D3DXVECTO
 	{
 		return true;
 	}
+	if (pos2.x + size2.x > pos1.x - size1.x && pos1.x + size1.x > pos2.x - size2.x &&
+		pos2.y + size2.y > pos1.y - size1.y && pos1.y + size1.y > pos2.y - size2.y)
+	{
+		return true;
+	}
 	return false;
 }
 //=============================================================================
@@ -670,7 +670,8 @@ void CheckHit(void)
 		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
 		if (CheckHitBB(player_center, enemy_center, player_size/2 ,enemy_size) &&
 			player->pos.z == enemy->pos.z &&
-			enemy->direction != player->direction)
+			enemy->direction != player->direction
+			)
 		{
 			enemy->use = false;
 
@@ -688,7 +689,14 @@ void CheckHit(void)
 			}
 			else
 			{
-				AddScore(50);
+				gameData.isCombo = TRUE;		// コンボ開始
+				gameData.numCombo++;
+				AddScore(50);			
+				AddNumPanty();
+				if (player->status.LUCK > 100)
+					player->status.LUCK -= 100;
+				else
+					player->status.LUCK = 0;
 			}
 		}
 	}
@@ -698,13 +706,13 @@ void CheckHit(void)
 	for (int j = 0; j < ENEMY_MAX; j++, enemy++)
 	{
 		if (enemy->use == false) continue;
-		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
+		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X, TEXTURE_ENEMY_SIZE_Y, 0);
 		for (int i = 0; i < BULLET_MAX; i++, bullet++)
 		{
 			if (bullet->use == false) continue;
-			bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X / 2, TEXTURE_BULLET_SIZE_Y / 2, 0);
-			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size) &&
-				player->pos.z == enemy->pos.z
+			bullet_center = bullet->pos + D3DXVECTOR3(TEXTURE_BULLET_SIZE_X, TEXTURE_BULLET_SIZE_Y, 0);
+			if (CheckHitBB(bullet_center, enemy_center, bullet_size, enemy_size)
+				//&&  player->pos.z == enemy->pos.z
 				)
 			{
 				if (enemy->type == 1)
@@ -722,13 +730,21 @@ void CheckHit(void)
 						//enemy->direction = 1;
 						enemy->use = false;
 						AddNumPanty();
+
+						if (player->status.LUCK > 100)
+							player->status.LUCK -= 100;
+						else
+							player->status.LUCK = 0;
 					}
 				}
 				else if(enemy->direction == player->direction)
 				{// ターゲット
 					gameData.isCombo = TRUE;		// コンボ開始
 					gameData.numCombo++;
-					AddScore(100);					// ●あたったフレーム数分スコアが入ってしまっている？
+					if (player->status.LUCK > 100)
+						AddScore(200);					// ●あたったフレーム数分スコアが入ってしまっている？
+					else
+						AddScore(100);
 					//enemy->direction = 1;
 					enemy->use = false;
 					AddNumPanty();

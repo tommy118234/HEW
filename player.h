@@ -10,7 +10,8 @@
 #include "main.h"
 
 #define TEXTURE_GAME_PLAYER		_T("data/TEXTURE/player.png")	// サンプル用画像
-#define TEXTURE_GAME_PLAYER2	_T("data/TEXTURE/attack3.png")	// サンプル用画像
+#define TEXTURE_GAME_PLAYER2	_T("data/TEXTURE/attack.png")	// サンプル用画像
+#define TEXTURE_GAME_PLAYER3	_T("data/TEXTURE/player_star.png")	// サンプル用画像
 #define TEXTURE_PLAYER_SIZE_X	(140)							// テクスチャサイズ
 #define TEXTURE_PLAYER_SIZE_Y	(200)							// 同上
 
@@ -20,7 +21,7 @@
 #define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// アニメーションパターン数
 
 #define PLAYER_MAX	(1)			// プレイヤーの数
-#define MOVE_MAX	(2)			// プレイヤーの数
+#define MOVE_MAX	(3)			// プレイヤーの数
 
 // スクロール開始座標
 #define LEFT_SCROLL_LINE_X	(SCREEN_WIDTH * 0.05f)
