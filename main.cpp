@@ -398,6 +398,8 @@ void Uninit(void)
 void Update(void)
 {
 	UpdateInput();					// 入力更新		
+	PLAYER *player = GetPlayer(0);
+
 	switch (stage)
 	{
 	case SPLASH:
@@ -412,9 +414,17 @@ void Update(void)
 		break;
 
 	case GAME:
+		//if (player->status.LUCK > 0)
+		//{
+		//	PlayGameSound(BGM_MUTEKI, CONTINUE_SOUND, LOOP);
+		//	StopSound(BGM_GAME, CONTINUE_SOUND);
+		//}
+		//else
+		//{
+			PlayGameSound(BGM_GAME, CONTINUE_SOUND, LOOP);
+		//	StopSound(BGM_MUTEKI, CONTINUE_SOUND);
+		//}
 
-		PlayGameSound(BGM_GAME, CONTINUE_SOUND, LOOP);
-		//PlayGameSound(BGM_MUTEKI, CONTINUE_SOUND, LOOP);
 		UpdatePlayer();				// プレイヤーの更新
 		UpdateBullet();				// バレットの更新
 		UpdateEnemy();				// ENEMYの更新
@@ -480,7 +490,7 @@ void Draw(void)
 
 		case GAME:
 			DrawBg();					// BGの描画
-			//DrawRoad();					// 道の描画
+			//DrawRoad();				// 道の描画
 
 			// プレイヤー, エネミー, アイテムをY座標でソートして描画
 			SortDraw(OBJECT_MAX);
@@ -491,34 +501,7 @@ void Draw(void)
 
 			PrintDebugProc(2, "num : %d\n", gameData.numCombo);
 			PrintDebugProc(2, "score : %d\n", GetScore()->value);
-			//player_center = player->pos + D3DXVECTOR3(TEXTURE_PLAYER_SIZE_X / 2, TEXTURE_PLAYER_SIZE_Y / 2, 0);
-			//PrintDebugProc(1, "P : %f\n", player_center.y);
-			//for (i = 0; i < ENEMY_MAX; i++ ,enemy++)
-			//{
-			//	if (enemy->use == true) 
-			//	{
-			//		enemy_center = enemy->pos + D3DXVECTOR3(TEXTURE_ENEMY_SIZE_X / 2, TEXTURE_ENEMY_SIZE_Y / 2, 0);
-			//		PrintDebugProc(1, "%d  %f\n",i+1, enemy_center.y);
-			//		if (player->pos.y > enemy->pos.y)
-			//		{
-			//			DrawEnemy(i);	 // ENEMYの描画	
-			//		}
-			//		else
-			//		{
-			//			DrawPlayer();
-			//			break;
-			//		}
-			//	}
-			//}
-			//if (i == ENEMY_MAX)
-			//	DrawPlayer();
-			//while (i < ENEMY_MAX)
-			//{
-			//	DrawEnemy(i);
-			//	i++;
-			//	enemy++;
-			//}
-			//DrawBullet();
+
 			// UI
 			DrawPanty();				// パンティの描画
 			DrawTimer();				// タイマーの描画

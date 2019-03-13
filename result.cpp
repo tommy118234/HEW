@@ -14,6 +14,7 @@
 #include "timer.h"
 #include "score.h"
 #include "life.h"
+#include "panty.h"
 #include "result.h"
 #include "debugproc.h"
 
@@ -22,7 +23,7 @@
 // マクロ定義
 //*****************************************************************************
 // テクスチャ場所
-#define TEXTURE_GAME_CLEAR		_T("data/TEXTURE/game_clear.png")
+#define TEXTURE_GAME_CLEAR		_T("data/TEXTURE/clear.png")
 #define TEXTURE_GAME_OVER		_T("data/TEXTURE/gameover.png")
 
 // リザルトのサイズ
@@ -141,6 +142,7 @@ void UpdateResult(void)
 		gameData->isGameClear = FALSE;
 		gameData->isCombo = FALSE;
 		gameData->numCombo = 0;
+		GetPanty()->numPanty = 0;
 		InitPlayer(REINIT);
 		InitEnemy(REINIT);
 		InitBg(REINIT);

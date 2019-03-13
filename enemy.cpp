@@ -26,6 +26,9 @@ void	 SetEnemy(void);
 ENEMY			   enemy[ENEMY_MAX];			// エネミー構造体
 LPDIRECT3DTEXTURE9 enemyTexture[2];				// 二種類のエネミー
 int				   enemy_count,enemy_rate;		// エネミーの出現頻度
+
+
+
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -102,15 +105,19 @@ void UpdateEnemy(void)
 		}
 		else
 		{
+			enemy->pos = D3DXVECTOR3(SCREEN_OUT, SCREEN_OUT, -1.0f);
+			SetVertexEnemy(i);
 			enemy_count++;
 			if (enemy_count>enemy_rate)			
 			SetEnemy();
 		}
 	}
-	PrintDebugProc(1, "Enemy1_Z:%f\n", GetEnemy(0)->pos.z);
-	PrintDebugProc(1, "Enemy2_Z:%f\n", GetEnemy(1)->pos.z);
-	PrintDebugProc(1, "Enemy3_Z:%f\n", GetEnemy(2)->pos.z);
-	PrintDebugProc(1, "Enemy4_Z:%f\n", GetEnemy(3)->pos.z);
+	PrintDebugProc(1, "Enemy0_XYZ:%f\n", GetEnemy(0)->pos.x, GetEnemy(0)->pos.y, GetEnemy(0)->pos.z);
+	PrintDebugProc(1, "Enemy1_XYZ:%f\n", GetEnemy(1)->pos.x, GetEnemy(1)->pos.y, GetEnemy(1)->pos.z);
+	PrintDebugProc(1, "Enemy2_XYZ:%f\n", GetEnemy(2)->pos.x, GetEnemy(2)->pos.y, GetEnemy(2)->pos.z);
+	PrintDebugProc(1, "Enemy3_XYZ:%f\n", GetEnemy(3)->pos.x, GetEnemy(3)->pos.y, GetEnemy(3)->pos.z);
+
+	
 }
 
 //=============================================================================
