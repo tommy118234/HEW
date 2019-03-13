@@ -7,6 +7,7 @@
 #include "main.h"
 #include "input.h"
 #include "player.h"
+#include "road.h"
 #include "item.h"
 
 
@@ -21,18 +22,19 @@
 #define MOVE_SPEED_X		(2.0f)
 
 /* アイテムセット関係 */
-#define IEMSET_RAND_RANGE	(1)					// アイテム出現頻度の調整値
+#define IEMSET_RAND_RANGE	(700)				// アイテム出現頻度の調整値
 #define ITEM_SET_NUMBER		(0)					// アイテム出現
-#define LANE_MAX			(4)					// 仮想レーンの数
+
 // リポップ時
 #define SET_POS_Y(_lane)	(SCREEN_HEIGHT * 0.5f + _lane * (SCREEN_HEIGHT * 0.1f))	// 座標
 #define SET_SIZE_X(_lane)	(ITEM_SIZE_X + _lane * ITEM_SIZE_X * 0.5)				// サイズX
 #define SET_SIZE_Y(_lane)	(ITEM_SIZE_Y + _lane * ITEM_SIZE_Y * 0.5)				// サイズY
+
 // サイン波
 #define WAVE_CNT_UNIT		(0.02f)				// カウント単位radian
 #define WAVE_HEIGHT			(2.0f)				// 高さ
 
-
+#define LANE_MAX			(4)
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -48,6 +50,7 @@ void SetItemGameStage(void);					// アイテムをセット
 //*****************************************************************************
 ITEM item;
 float waveAngleCounter;
+
 
 //=============================================================================
 // 初期化処理
@@ -91,19 +94,17 @@ void UpdateItem(void)
 	if (item.use == FALSE)
 	{
 		item.cntNonUseTime++;
-		if (item.cntNonUseTime > SECOND(1))
+		if (item.cntNonUseTime > SECOND(10))
 		{
 			SetItemGameStage();
 		}
 		return;
 	}
 
-	waveAngleCounter += WAVE_CNT_UNIT;
 	  
 	// アイテムの移動
 	item.pos.x -= MOVE_SPEED_X;
-	item.pos.y += WAVE_HEIGHT * sin(waveAngleCounter);
-
+	//item.pos.y += WAVE_HEIGHT * sin(waveAngleCounter);
 
 	// 画面端で消去
 	if (item.pos.x + ITEM_SIZE_X < 0.0f)
@@ -125,11 +126,14 @@ void DrawItem(int itemNo)
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-	// テクスチャの設定
-	pDevice->SetTexture( 0, item.pTexture );
+	if (item.use)
+	{
+		// テクスチャの設定
+		pDevice->SetTexture(0, item.pTexture);
 
-	// ポリゴンの描画
-	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, item.vertexWk, sizeof(VERTEX_2D));
+		// ポリゴンの描画
+		pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, NUM_POLYGON, item.vertexWk, sizeof(VERTEX_2D));
+	}
 }
 
 
@@ -209,7 +213,10 @@ void SetItemGameStage(void)
 {
 	// 出現頻度調整
 	int number = rand() % IEMSET_RAND_RANGE;
-	if (number != ITEM_SET_NUMBER) { return; }
+	if (number != ITEM_SET_NUMBER)
+	{
+		return;
+	}
 	
 	// レーンをランダムに決定
 	int lane = -1;
@@ -217,6 +224,7 @@ void SetItemGameStage(void)
 
 	// 座標と大きさを設定しリポップの準備
 	item.use = TRUE;
+	item.cntNonUseTime = 0;
 	item.pos = D3DXVECTOR3((float)SCREEN_WIDTH, (float)SET_POS_Y(lane), (float)lane);
 	item.sizeX = SET_SIZE_X(lane);
 	item.sizeY = SET_SIZE_Y(lane);

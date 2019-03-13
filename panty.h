@@ -46,7 +46,8 @@ void UpdatePanty(void);
 void DrawPanty(void);
 // パンティの数を追加
 void AddNumPanty(void);
-
+// パンティ取得
+GAMEPANTY *GetPanty(void);
 
 
 #endif
