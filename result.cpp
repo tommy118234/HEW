@@ -155,7 +155,7 @@ void UpdateResult(void)
 	}
 
 
-	PrintDebugProc(1, "Score:%d\n", score->value);
+	//PrintDebugProc(1, "Score:%d\n", score->value);
 }
 
 

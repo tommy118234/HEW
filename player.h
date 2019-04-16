@@ -52,7 +52,7 @@ struct	PLAYER										// キャラクターの基本構造体
 //*****************************************************************************
 HRESULT		InitPlayer(int type);
 void		UninitPlayer(void);
-void		UpdatePlayer(void);
+void		UpdatePlayer(int type);
 void		DrawPlayer(int pno);
 PLAYER		*GetPlayer(int pno);	// プレイヤーの(アドレス)を取得
 #endif

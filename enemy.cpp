@@ -112,10 +112,10 @@ void UpdateEnemy(void)
 			SetEnemy();
 		}
 	}
-	PrintDebugProc(1, "Enemy0_XYZ:%f\n", GetEnemy(0)->pos.x, GetEnemy(0)->pos.y, GetEnemy(0)->pos.z);
-	PrintDebugProc(1, "Enemy1_XYZ:%f\n", GetEnemy(1)->pos.x, GetEnemy(1)->pos.y, GetEnemy(1)->pos.z);
-	PrintDebugProc(1, "Enemy2_XYZ:%f\n", GetEnemy(2)->pos.x, GetEnemy(2)->pos.y, GetEnemy(2)->pos.z);
-	PrintDebugProc(1, "Enemy3_XYZ:%f\n", GetEnemy(3)->pos.x, GetEnemy(3)->pos.y, GetEnemy(3)->pos.z);
+	//PrintDebugProc(1, "Enemy0_XYZ:%f\n", GetEnemy(0)->pos.x, GetEnemy(0)->pos.y, GetEnemy(0)->pos.z);
+	//PrintDebugProc(1, "Enemy1_XYZ:%f\n", GetEnemy(1)->pos.x, GetEnemy(1)->pos.y, GetEnemy(1)->pos.z);
+	//PrintDebugProc(1, "Enemy2_XYZ:%f\n", GetEnemy(2)->pos.x, GetEnemy(2)->pos.y, GetEnemy(2)->pos.z);
+	//PrintDebugProc(1, "Enemy3_XYZ:%f\n", GetEnemy(3)->pos.x, GetEnemy(3)->pos.y, GetEnemy(3)->pos.z);
 
 	
 }
@@ -191,7 +191,7 @@ void SetTextureEnemy(int no, int cntPattern)
 	float sizeX = 1.0f / TEXTURE_PATTERN_DIVIDE_X;
 	float sizeY = 1.0f / TEXTURE_PATTERN_DIVIDE_Y;
 		
-	if (enemy->direction < 0)
+	if (enemy->direction == 1)
 	{
 		enemy->vtx[0].tex = D3DXVECTOR2((float)(x)* sizeX, (float)(y)* sizeY);
 		enemy->vtx[1].tex = D3DXVECTOR2((float)(x)* sizeX + sizeX, (float)(y)* sizeY);

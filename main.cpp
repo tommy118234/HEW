@@ -425,7 +425,7 @@ void Update(void)
 			StopSound(BGM_MUTEKI, CONTINUE_SOUND);
 		}
 
-		UpdatePlayer();				// プレイヤーの更新
+		UpdatePlayer(0);				// プレイヤーの更新
 		UpdateBullet();				// バレットの更新
 		UpdateEnemy();				// ENEMYの更新
 		UpdateBg();					// BGの更新
@@ -442,6 +442,7 @@ void Update(void)
 		break;
 
 	case RESULT:
+		UpdatePlayer(1);				// プレイヤーの更新
 		UpdateResult();				// リザルトの更新
 		break;
 
@@ -499,9 +500,9 @@ void Draw(void)
 				(*sortArray[i].drawFunc)(sortArray[i].objectNo);
 			}
 
-			PrintDebugProc(2, "num : %d\n", gameData.numCombo);
-			PrintDebugProc(2, "score : %d\n", GetScore()->value);
-
+			//PrintDebugProc(2, "num : %d\n", gameData.numCombo);
+			//PrintDebugProc(2, "score : %d\n", GetScore()->value);
+			//DrawBullet();
 			// UI
 			DrawPanty();				// パンティの描画
 			DrawTimer();				// タイマーの描画
@@ -523,7 +524,7 @@ void Draw(void)
 		}
 
 #ifdef _DEBUG
-		DrawDebugProc();				// デバッグ表示の描画
+		//DrawDebugProc();				// デバッグ表示の描画
 #endif
 
 		//  direct3D による描画の終了
@@ -723,7 +724,7 @@ void CheckHit(void)
 							player->status.LUCK = 0;
 					}
 				}
-				else if(enemy->direction == player->direction)
+				else 
 				{// ターゲット
 					gameData.isCombo = TRUE;		// コンボ開始
 					gameData.numCombo++;

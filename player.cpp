@@ -81,137 +81,169 @@ void UninitPlayer(void)
 //=============================================================================
 // 更新処理
 //=============================================================================
-void UpdatePlayer(void)
+void UpdatePlayer(int type)
 {
 	PLAYER *player = GetPlayer(0);
 	player->speed_boost = 1;
-	if (GetKeyboardPress(DIK_LCONTROL) || GetKeyboardPress(DIK_RCONTROL) || IsButtonPressed(0, BUTTON_Y))
-		player->speed_boost = 2.0f;
-	if (player->status.LUCK >0)
-		player->speed_boost = 3.0f;
-	// アニメーション
-	if (!GetBullet(0)->use)
-		player->countAnim += player->speed * player->speed_boost * 0.1f;
-	else
-		player->countAnim += player->speed * player->speed_boost * 0.2f;
-	if (player->moving_cooldown > 0)
+
+	if (type == 0)
 	{
-		player->patternAnim = (int)(player->countAnim) % aNIM_PATTERN_NUM;
-		// テクスチャ座標を設定
-		SetTexturePlayer(player->direction, player->patternAnim);
-		if (player->patternAnim == 6)
-			player->moving_cooldown--;
+		if (GetKeyboardPress(DIK_LCONTROL) || GetKeyboardPress(DIK_RCONTROL) || IsButtonPressed(0, BUTTON_Y))
+			player->speed_boost = 2.0f;
+		if (player->status.LUCK > 0)
+			player->speed_boost = 3.0f;
+		// アニメーション
+		if (!GetBullet(0)->use)
+			player->countAnim += player->speed * player->speed_boost * 0.1f;
+		else
+			player->countAnim += player->speed * player->speed_boost * 0.2f;
+		if (player->moving_cooldown > 0)
+		{
+			player->patternAnim = (int)(player->countAnim) % aNIM_PATTERN_NUM;
+			// テクスチャ座標を設定
+			SetTexturePlayer(player->direction, player->patternAnim);
+			if (player->patternAnim == 6)
+				player->moving_cooldown--;
+		}
+		// 入力対応
+		if (GetKeyboardTrigger(DIK_DOWN) || IsButtonPressed(0, BUTTON_DOWN))
+		{
+			player->moving_cooldown = 1;
+			player->pos.y += player->speed * player->speed_boost;
+			if (player->pos.z < 3)
+				player->pos.z++;
+
+		}
+		if (GetKeyboardTrigger(DIK_UP) || IsButtonPressed(0, BUTTON_UP))
+		{
+
+			player->moving_cooldown = 1;
+			player->pos.y -= player->speed * player->speed_boost;
+			if (player->pos.z > 0)
+				player->pos.z--;
+		}
+		if (GetKeyboardPress(DIK_LEFT) || IsButtonPressed(0, BUTTON_LEFT))
+		{
+			player->moving_cooldown = 1;
+			player->direction = -1;
+			player->pos.x -= player->speed * player->speed_boost;
+		}
+		if (GetKeyboardPress(DIK_RIGHT) || IsButtonPressed(0, BUTTON_RIGHT))
+		{
+			player->moving_cooldown = 1;
+			player->direction = 1;
+			player->pos.x += player->speed * player->speed_boost;
+		}
+		if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTriggered(0, BUTTON_A))
+		{
+			player->moving_cooldown = 1;
+			D3DXVECTOR3 player_centre;
+			player_centre.x = player->pos.x + player->direction * tEXTURE_PLAYER_SIZE_X / 2;
+			player_centre.y = player->pos.y + tEXTURE_PLAYER_SIZE_Y;
+			SetBullet(player_centre, player->status.ATK, player->direction);
+			//tEXTURE_PLAYER_SIZE_X = 194;
+			//tEXTURE_PLAYER_SIZE_Y = 209;
+			//tEXTURE_PATTERN_DIVIDE_X = 3;
+			//aNIM_PATTERN_NUM = 6;
+		}
+		//if (!GetBullet(0)->use)
+		//{
+		//	tEXTURE_PLAYER_SIZE_X = 140;
+		//	tEXTURE_PLAYER_SIZE_Y = 200;
+		//	tEXTURE_PATTERN_DIVIDE_X = 5;
+		//	aNIM_PATTERN_NUM = 10;
+		//}
+		if (player->pos.x < 0)
+		{
+			player->pos.x = 0;
+		}
+		else if (player->pos.x > SCREEN_WIDTH - tEXTURE_PLAYER_SIZE_X)
+		{
+			player->pos.x = SCREEN_WIDTH - tEXTURE_PLAYER_SIZE_X;
+		}
+		else if (player->pos.y < SCREEN_HEIGHT * 0.85f - tEXTURE_PLAYER_SIZE_Y)
+		{
+			player->pos.y = SCREEN_HEIGHT * 0.85f - tEXTURE_PLAYER_SIZE_Y;
+		}
+		else if (player->pos.y > SCREEN_HEIGHT - tEXTURE_PLAYER_SIZE_Y)
+		{
+			player->pos.y = SCREEN_HEIGHT - tEXTURE_PLAYER_SIZE_Y;
+		}
+
+		// ●中込追加部分 ゴールが見えてないときはこの処理
+		// ゴールが見えているときは画面端まで移動できるらしい
+		if (player->pos.x > RIGHT_SCROLL_LINE_X)
+		{
+			player->pos.x = RIGHT_SCROLL_LINE_X;
+		}
+		else if (player->pos.x < LEFT_SCROLL_LINE_X)
+		{
+			player->pos.x = LEFT_SCROLL_LINE_X;
+		}
+
+		// Yの座標によって、Z(偽Depth)を変わる
+		player->pos.y = SCREEN_HEIGHT * 0.85f - TEXTURE_PLAYER_SIZE_Y + player->pos.z*(SCREEN_HEIGHT*0.05f);
+
+
+		//player->pos.z = 0;
+		//if (player->pos.y > SCREEN_HEIGHT * 0.8f - tEXTURE_PLAYER_SIZE_Y / 2)
+		//{
+		//	player->pos.z = 3;
+		//}
+		//else if (player->pos.y > SCREEN_HEIGHT * 0.75f - tEXTURE_PLAYER_SIZE_Y / 2)
+		//{
+		//	player->pos.z = 2;
+		//}
+		//
+		//else if (player->pos.y > SCREEN_HEIGHT * 0.7f - tEXTURE_PLAYER_SIZE_Y / 2)
+		//{
+		//	player->pos.z = 1;
+		//}
+
+		if (player->status.LUCK > 0)
+		{
+			player->status.LUCK--;
+
+		}
 	}
-	// 入力対応
-	if (GetKeyboardTrigger(DIK_DOWN) || IsButtonPressed(0, BUTTON_DOWN))
+	else 
 	{
-		player->moving_cooldown = 1;
-		player->pos.y += player->speed * player->speed_boost;
-		if (player->pos.z < 3)
-			player->pos.z++;
+		if (player->status.HP > 0)
+		{
+			player->status.LUCK = 1;
+			player->countAnim += player->speed * player->speed_boost * 0.2f;
+			player->patternAnim = (int)(player->countAnim) % aNIM_PATTERN_NUM;
+			// テクスチャ座標を設定
+			SetTexturePlayer(player->direction, player->patternAnim);
+		}
+		else 
+		{
+			player->status.LUCK = 0;
+			player->countAnim += player->speed * player->speed_boost * 0.1f;
+			player->patternAnim = (int)(player->countAnim) % aNIM_PATTERN_NUM;
+			// テクスチャ座標を設定
+			SetTexturePlayer(player->direction, player->patternAnim);
+
+			D3DXVECTOR3 player_centre;
+			player_centre.x = player->pos.x + player->direction * tEXTURE_PLAYER_SIZE_X / 2;
+			player_centre.y = player->pos.y + tEXTURE_PLAYER_SIZE_Y;
+			SetBullet(player_centre, player->status.ATK, player->direction);
+		
+		}
+
 
 	}
-	if (GetKeyboardTrigger(DIK_UP) || IsButtonPressed(0, BUTTON_UP))
-	{
 
-		player->moving_cooldown = 1;
-		player->pos.y -= player->speed * player->speed_boost;
-		if (player->pos.z > 0)
-			player->pos.z--;
-	}
-	if (GetKeyboardPress(DIK_LEFT) || IsButtonPressed(0, BUTTON_LEFT))
-	{
-		player->moving_cooldown = 1;
-		player->direction = -1;
-		player->pos.x -= player->speed * player->speed_boost;
-	}
-	if (GetKeyboardPress(DIK_RIGHT) || IsButtonPressed(0, BUTTON_RIGHT))
-	{
-		player->moving_cooldown = 1;
-		player->direction = 1;
-		player->pos.x += player->speed * player->speed_boost;
-	}
-	if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTriggered(0, BUTTON_A))
-	{
-		player->moving_cooldown = 1;
-		D3DXVECTOR3 player_centre;
-		player_centre.x = player->pos.x + player->direction * tEXTURE_PLAYER_SIZE_X / 2;
-		player_centre.y = player->pos.y + tEXTURE_PLAYER_SIZE_Y;
-		SetBullet(player_centre, player->status.ATK, player->direction);
-		//tEXTURE_PLAYER_SIZE_X = 194;
-		//tEXTURE_PLAYER_SIZE_Y = 209;
-		//tEXTURE_PATTERN_DIVIDE_X = 3;
-		//aNIM_PATTERN_NUM = 6;
-	}
-	//if (!GetBullet(0)->use)
-	//{
-	//	tEXTURE_PLAYER_SIZE_X = 140;
-	//	tEXTURE_PLAYER_SIZE_Y = 200;
-	//	tEXTURE_PATTERN_DIVIDE_X = 5;
-	//	aNIM_PATTERN_NUM = 10;
-	//}
-	if (player->pos.x < 0)
-	{
-		player->pos.x = 0;
-	}
-	else if (player->pos.x > SCREEN_WIDTH - tEXTURE_PLAYER_SIZE_X)
-	{
-		player->pos.x = SCREEN_WIDTH - tEXTURE_PLAYER_SIZE_X;
-	}
-	else if (player->pos.y < SCREEN_HEIGHT * 0.85f - tEXTURE_PLAYER_SIZE_Y)
-	{
-		player->pos.y = SCREEN_HEIGHT * 0.85f - tEXTURE_PLAYER_SIZE_Y;
-	}
-	else if (player->pos.y > SCREEN_HEIGHT - tEXTURE_PLAYER_SIZE_Y)
-	{
-		player->pos.y = SCREEN_HEIGHT - tEXTURE_PLAYER_SIZE_Y;
-	}
-
-	// ●中込追加部分 ゴールが見えてないときはこの処理
-	// ゴールが見えているときは画面端まで移動できるらしい
-	if (player->pos.x > RIGHT_SCROLL_LINE_X)
-	{
-		player->pos.x = RIGHT_SCROLL_LINE_X;
-	}
-	else if (player->pos.x < LEFT_SCROLL_LINE_X)
-	{
-		player->pos.x = LEFT_SCROLL_LINE_X;
-	}
-
-	// Yの座標によって、Z(偽Depth)を変わる
-	player->pos.y = SCREEN_HEIGHT * 0.85f - TEXTURE_PLAYER_SIZE_Y + player->pos.z*(SCREEN_HEIGHT*0.05f);
-
-
-	//player->pos.z = 0;
-	//if (player->pos.y > SCREEN_HEIGHT * 0.8f - tEXTURE_PLAYER_SIZE_Y / 2)
-	//{
-	//	player->pos.z = 3;
-	//}
-	//else if (player->pos.y > SCREEN_HEIGHT * 0.75f - tEXTURE_PLAYER_SIZE_Y / 2)
-	//{
-	//	player->pos.z = 2;
-	//}
-	//
-	//else if (player->pos.y > SCREEN_HEIGHT * 0.7f - tEXTURE_PLAYER_SIZE_Y / 2)
-	//{
-	//	player->pos.z = 1;
-	//}
-
-	if (player->status.LUCK > 0)
-	{
-		player->status.LUCK--;
-
-	}
 	//if (player->status.LUCK>600)
 	//	player->status.LUCK=0;
 
 	// 移動後の座標で頂点を設定
 	SetVertexPlayer();
 
-	PrintDebugProc(1, "Player_Y:%f\n", player->pos.y);
-	PrintDebugProc(1, "Player_Z:%f\n", player->pos.z);
-
-	PrintDebugProc(1, "Player_LUCK:%d\n", player->status.LUCK);
+	//PrintDebugProc(1, "Player_Y:%f\n", player->pos.y);
+	//PrintDebugProc(1, "Player_Z:%f\n", player->pos.z);
+	//
+	//PrintDebugProc(1, "Player_LUCK:%d\n", player->status.LUCK);
 }
 
 //=============================================================================
